@@ -322,6 +322,23 @@ function loadDb() {
     }
     for (const gid of Object.keys(data.guilds)) {
       const g = data.guilds[gid];
+      if (gid === 'meta7k' && Array.isArray(g.combos)) {
+        if (g.combos[0] && !g.combos[0].houseNo) {
+          g.combos[0].houseNo = 1;
+          g.combos[0].isFortress = true;
+          g.combos[0].customName = 'ป้อมหัวกิลด์ (ถึกโรซี่)';
+        }
+        if (g.combos[1] && !g.combos[1].houseNo) {
+          g.combos[1].houseNo = 2;
+          g.combos[1].isFortress = false;
+          g.combos[1].customName = 'บ้านสปีดแฝดลิง';
+        }
+        if (g.combos[2] && !g.combos[2].houseNo) {
+          g.combos[2].houseNo = 3;
+          g.combos[2].isFortress = false;
+          g.combos[2].customName = 'บ้านเวทย์หลับยอนฮี';
+        }
+      }
       if (!g.targets) g.targets = [];
       if (!g.plans) g.plans = [];
       if (!g.schedule) {
