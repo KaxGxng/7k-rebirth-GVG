@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   X,
   Search,
@@ -11,7 +11,10 @@ import {
   Plus,
   RefreshCw,
   ExternalLink,
+  Camera,
+  Sparkles,
 } from 'lucide-react';
+import { TeamScreenshotModal } from './TeamScreenshotModal';
 import type {
   StrategyId,
   TeamType,
@@ -154,6 +157,66 @@ export const TeamBuilderModal: React.FC<TeamBuilderModalProps> = ({
 
   const [saving, setSaving] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [showAiScanModal, setShowAiScanModal] = useState(false);
+
+  // Paste screenshot listener inside modal
+  useEffect(() => {
+    const handlePaste = (e: ClipboardEvent) => {
+      const target = e.target as HTMLElement;
+      if (target?.tagName === 'INPUT' || target?.tagName === 'TEXTAREA') return;
+      const items = e.clipboardData?.items;
+      if (!items) return;
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].type.startsWith('image/')) {
+          e.preventDefault();
+          setShowAiScanModal(true);
+          break;
+        }
+      }
+    };
+    window.addEventListener('paste', handlePaste);
+    return () => window.removeEventListener('paste', handlePaste);
+  }, []);
+
+  const handleApplyFromScreenshot = (data: any) => {
+    if (data.strategyId) setStrategyId(data.strategyId);
+    if (mode === 'enemy' && data.teamType) setTeamType(data.teamType);
+    if (data.houseNo) setHouseNo(data.houseNo);
+    if (data.isFortress !== undefined) setIsFortress(data.isFortress);
+    if (data.customName) setCustomName(data.customName);
+
+    const source =
+      mode === 'counter' && data.recommendedCounter ? data.recommendedCounter : data;
+
+    const newMap: Record<number, TeamCharacterSlot> = {};
+    for (const c of source.front?.characters || []) {
+      newMap[c.index] = {
+        index: c.index,
+        name: c.name,
+        description: c.description || '',
+        equip: { sets: [], rings: [] },
+      };
+    }
+    for (const c of source.back?.characters || []) {
+      newMap[c.index] = {
+        index: c.index,
+        name: c.name,
+        description: c.description || '',
+        equip: { sets: [], rings: [] },
+      };
+    }
+    setCharMap(newMap);
+
+    if (source.pets && Array.isArray(source.pets)) {
+      setPets(source.pets);
+    }
+
+    if (mode === 'counter') {
+      if (source.note) setNote(source.note);
+      if (source.skillOrder) setSkillOrder(source.skillOrder);
+    }
+    setShowAiScanModal(false);
+  };
 
   const strategy = getStrategyConfig(strategyId);
 
@@ -589,6 +652,35 @@ export const TeamBuilderModal: React.FC<TeamBuilderModalProps> = ({
 
         {/* Body */}
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-5">
+          {/* AI Screenshot Banner */}
+          <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-2xl bg-gradient-to-r from-purple-950/50 via-indigo-950/30 to-slate-900 border border-purple-500/30 shadow-lg shadow-purple-950/20">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-purple-500/20 border border-purple-500/30 text-purple-300 flex items-center justify-center shrink-0">
+                <Camera className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-xs sm:text-sm font-extrabold text-white flex items-center gap-2">
+                  <span>📸 แคปรูปหน้าจอมาแล้ว? จัดทีมอัตโนมัติด้วย AI</span>
+                  <span className="text-[10px] px-1.5 py-0.2 rounded bg-purple-500/30 text-purple-300 font-extrabold uppercase">
+                    Ctrl + V
+                  </span>
+                </p>
+                <p className="text-[11px] text-slate-400">
+                  กด <kbd className="px-1.5 py-0.5 rounded bg-slate-800 text-purple-300 font-mono text-[10px]">Ctrl+V</kbd> เพื่อวางรูปแคป หรือคลิกปุ่มเพื่อเปิดเครื่องมือวิเคราะห์
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setShowAiScanModal(true)}
+              className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold shadow-md shadow-purple-600/30 cursor-pointer flex items-center gap-1.5 transition-all"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-purple-200" />
+              <span>สแกนรูปแคปจัดทีม</span>
+            </button>
+          </div>
+
           {errorMsg && (
             <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-rose-500/15 border border-rose-500/40 text-rose-300 text-xs sm:text-sm">
               <AlertCircle className="w-4 h-4 shrink-0" />
@@ -1424,6 +1516,14 @@ export const TeamBuilderModal: React.FC<TeamBuilderModalProps> = ({
           </div>
         </div>
       )}
+
+      {/* AI Screenshot Analyzer Modal */}
+      <TeamScreenshotModal
+        isOpen={showAiScanModal}
+        onClose={() => setShowAiScanModal(false)}
+        mode={mode === 'enemy' ? 'enemy' : 'counter'}
+        onApplyTeam={handleApplyFromScreenshot}
+      />
     </div>
   );
 };

@@ -28,7 +28,22 @@ import {
   Trophy,
   Star,
   Settings,
+  Database,
+  Download,
+  Upload,
+  Cloud,
+  RefreshCw,
+  ExternalLink,
+  CheckCircle2,
+  AlertTriangle,
 } from 'lucide-react';
+import { TeamScreenshotModal } from '../components/TeamScreenshotModal';
+import {
+  importGuildBackupApi,
+  sync7KNoteApi,
+  getSupabaseStatus,
+  type SupabaseStatus,
+} from '../lib/api';
 import type {
   GuildData,
   GuildCombo,
@@ -76,7 +91,6 @@ import {
 import { TeamFormationView } from '../components/TeamFormationView';
 import { TeamBuilderModal } from '../components/TeamBuilderModal';
 import { CounterDetailModal } from '../components/CounterDetailModal';
-import { TargetsView } from '../components/TargetsView';
 import { TargetBuilderModal } from '../components/TargetBuilderModal';
 import { WarPlansView } from '../components/WarPlansView';
 import { WarScheduleView } from '../components/WarScheduleView';
@@ -102,9 +116,9 @@ export const GuildPage: React.FC = () => {
   const [selectedComboId, setSelectedComboId] = useState<string | null>(null);
 
   // Tab navigation state: 'combos' (default) | 'schedule' | 'settings'
-  const currentTab =
-    (searchParams.get('tab') as 'combos' | 'schedule' | 'settings') ||
-    'combos';
+  const rawTab = searchParams.get('tab');
+  const currentTab: 'combos' | 'schedule' | 'settings' =
+    rawTab === 'schedule' || rawTab === 'settings' ? rawTab : 'combos';
 
   const setTab = (tab: 'combos' | 'schedule' | 'settings') => {
     setSelectedComboId(null);
@@ -114,6 +128,7 @@ export const GuildPage: React.FC = () => {
       return next;
     });
   };
+
 
   // Target House modal state
   const [targetModal, setTargetModal] = useState<{
@@ -162,6 +177,80 @@ export const GuildPage: React.FC = () => {
 
   // Toast message
   const [toast, setToast] = useState<string | null>(null);
+
+  // AI Screenshot Scanner Modal state
+  const [showAiScanModal, setShowAiScanModal] = useState<boolean>(false);
+
+  // Supabase & 7K-Note Sync state
+  const [supabaseStatus, setSupabaseStatus] = useState<SupabaseStatus | null>(null);
+  const [checkingSupabase, setCheckingSupabase] = useState(false);
+  const [copiedSql, setCopiedSql] = useState(false);
+  const [isSyncing7KNote, setIsSyncing7KNote] = useState(false);
+  const [showForceResync, setShowForceResync] = useState(false);
+
+  const checkSupabase = useCallback(async () => {
+    setCheckingSupabase(true);
+    try {
+      const status = await getSupabaseStatus();
+      setSupabaseStatus(status);
+    } catch {
+      // ignore
+    } finally {
+      setCheckingSupabase(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    checkSupabase();
+  }, [checkSupabase]);
+
+  const handleSync7KNote = async () => {
+    if (!guild || isSyncing7KNote) return;
+    const ok = window.confirm(
+      'คุณต้องการดึงข้อมูลโพยและสูตรแก้ทาง 37 บ้านจาก 7K-Note (4ZyeEGMZ) เข้าสู่กิลด์นี้ใช่หรือไม่?\n\n' +
+      '• บ้านศัตรูทั้ง 37 หลังจะถูกอัปเดตตรงตามเมต้าล่าสุด\n' +
+      '• มีการจัดทีม หน้า/หลัง, สัตว์เลี้ยง, ลำดับสกิล, เซ็ตของ, แหวน และสเตตัสครบถ้วน'
+    );
+    if (!ok) return;
+
+    setIsSyncing7KNote(true);
+    try {
+      const res = await sync7KNoteApi(shortId, '4ZyeEGMZ', true);
+      setGuild((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          targets: res.targets,
+          combos: res.combos,
+        };
+      });
+      showToast(`⚡ ซิงค์โพยสำเร็จ ${res.count} หลัง!`);
+      checkSupabase();
+    } catch (err: any) {
+      alert(err.message || 'เกิดข้อผิดพลาดในการซิงค์โพย');
+    } finally {
+      setIsSyncing7KNote(false);
+    }
+  };
+
+  // Global paste screenshot listener
+  useEffect(() => {
+    const handlePaste = (e: ClipboardEvent) => {
+      const target = e.target as HTMLElement;
+      if (target?.tagName === 'INPUT' || target?.tagName === 'TEXTAREA') return;
+      const items = e.clipboardData?.items;
+      if (!items) return;
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].type.startsWith('image/')) {
+          e.preventDefault();
+          setShowAiScanModal(true);
+          break;
+        }
+      }
+    };
+    window.addEventListener('paste', handlePaste);
+    return () => window.removeEventListener('paste', handlePaste);
+  }, []);
 
   // Theme state
   const [isDark, setIsDark] = useState(() =>
@@ -232,6 +321,16 @@ export const GuildPage: React.FC = () => {
   }, [searchParams, guild, shortId, setSearchParams]);
 
   const isAdmin = Boolean(guild?.is_admin);
+
+  const hasSyncedData = useMemo(
+    () =>
+      Boolean(
+        guild &&
+          ((guild.combos && guild.combos.length > 0) ||
+            (guild.targets && guild.targets.length > 0))
+      ),
+    [guild]
+  );
 
   const selectedCombo = useMemo(
     () => (guild?.combos || []).find((c) => c.id === selectedComboId) || null,
@@ -399,9 +498,7 @@ export const GuildPage: React.FC = () => {
         shortId,
         enemyTeam,
         [],
-        extra?.houseNo,
-        extra?.isFortress,
-        extra?.customName
+        extra
       );
       setGuild((prev) =>
         prev
@@ -434,6 +531,101 @@ export const GuildPage: React.FC = () => {
       showToast('ลบทีมเป้าหมายเรียบร้อยแล้ว');
     } catch (err: any) {
       alert(err?.message || 'ลบทีมไม่สำเร็จ');
+    }
+  };
+
+  // Direct save combo generated from AI screenshot
+  const handleDirectSaveAiCombo = async (payload: {
+    houseNo?: number;
+    isFortress?: boolean;
+    customName?: string;
+    enemyTeam: any;
+    counterTeams: any[];
+  }) => {
+    try {
+      const created = await createComboApi(
+        shortId,
+        payload.enemyTeam,
+        payload.counterTeams || [],
+        {
+          houseNo: payload.houseNo,
+          isFortress: payload.isFortress,
+          customName: payload.customName,
+        }
+      );
+      setGuild((prev) =>
+        prev
+          ? {
+              ...prev,
+              combos: [created, ...prev.combos],
+            }
+          : prev
+      );
+      setSelectedComboId(created.id);
+      showToast('⚡ สร้างโพยจากรูปแคปหน้าจอสำเร็จแล้ว!');
+    } catch (err: any) {
+      alert(err?.message || 'บันทึกโพยไม่สำเร็จ');
+    }
+  };
+
+  // Open builder populated with AI scan result
+  const handleApplyFromAiScan = (data: any) => {
+    const enemyTeam: EnemyTeam = {
+      strategyId: data.strategyId || '1-4',
+      teamType: data.teamType || 'tanky',
+      front: {
+        characters: (data.front?.characters || []).map((c: any) => ({
+          index: c.index,
+          name: c.name,
+          description: c.description || '',
+        })),
+      },
+      back: {
+        characters: (data.back?.characters || []).map((c: any) => ({
+          index: c.index,
+          name: c.name,
+          description: c.description || '',
+        })),
+      },
+      pets: data.pets || [null, null, null, null, null],
+    };
+
+    setBuilderModal({
+      mode: 'enemy',
+      initialEnemy: enemyTeam,
+      initialHouseNo: data.houseNo,
+      initialIsFortress: data.isFortress,
+      initialCustomName: data.customName,
+    });
+  };
+
+  // Import Backup JSON file
+  const handleImportBackupFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const text = await file.text();
+      const json = JSON.parse(text);
+
+      if (!json.combos && !json.targets && !json.schedule) {
+        alert('ไฟล์ข้อมูลไม่ถูกต้อง ไม่พบข้อมูลโพยกิลด์');
+        return;
+      }
+
+      const count = json.combos?.length || 0;
+      const doMerge = window.confirm(
+        `พบข้อมูลโพย ${count} รายการในไฟล์สำรอง\n\nกด "ตกลง (OK)" เพื่อรวมข้อมูลเข้ากับของเดิม (Merge)\nกด "ยกเลิก (Cancel)" เพื่อแทนที่ของเดิมทั้งหมดด้วยไฟล์นี้ (Replace)`
+      );
+
+      const mode = doMerge ? 'merge' : 'replace';
+      const updatedGuild = await importGuildBackupApi(shortId, json, mode);
+      setGuild(updatedGuild);
+      showToast(`กู้คืนข้อมูลโพยเรียบร้อยแล้ว (${mode === 'merge' ? 'รวมข้อมูล' : 'แทนที่ทั้งหมด'})`);
+    } catch (err: any) {
+      alert(`กู้คืนข้อมูลไม่สำเร็จ: ${err.message || 'ไฟล์เสียหาย'}`);
+    } finally {
+      e.target.value = '';
     }
   };
 
@@ -976,6 +1168,7 @@ export const GuildPage: React.FC = () => {
             </span>
           </button>
 
+
           <button
             type="button"
             onClick={() => setTab('schedule')}
@@ -1033,16 +1226,33 @@ export const GuildPage: React.FC = () => {
                 )}
               </div>
 
-              {isAdmin && (
-                <button
-                  type="button"
-                  onClick={() => setBuilderModal({ mode: 'enemy' })}
-                  className="shrink-0 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs sm:text-sm shadow-lg shadow-amber-500/20 cursor-pointer"
-                >
-                  <Plus className="w-4 h-4" />
-                  <span>เพิ่มบ้านกันและสูตรแก้</span>
-                </button>
-              )}
+              <div className="flex items-center gap-2">
+
+                {isAdmin && (
+                  <>
+                    {!hasSyncedData && (
+                      <button
+                        type="button"
+                        onClick={handleSync7KNote}
+                        disabled={isSyncing7KNote}
+                        className="shrink-0 inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 font-extrabold text-xs sm:text-sm border border-amber-500/30 cursor-pointer disabled:opacity-50 transition-all"
+                        title="ดึงข้อมูลโพยและสูตร 37 บ้านจาก 7K-Note (4ZyeEGMZ)"
+                      >
+                        <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                        <span>{isSyncing7KNote ? 'กำลังซิงค์...' : '⚡ ซิงค์ 7K-Note (37 บ้าน)'}</span>
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setBuilderModal({ mode: 'enemy' })}
+                      className="shrink-0 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs sm:text-sm shadow-lg shadow-amber-500/20 cursor-pointer"
+                    >
+                      <Plus className="w-4 h-4" />
+                      <span>เพิ่มบ้านกันและสูตรแก้</span>
+                    </button>
+                  </>
+                )}
+              </div>
             </div>
 
             {/* Filter Pills by Team Type */}
@@ -1687,7 +1897,6 @@ export const GuildPage: React.FC = () => {
       )}
 
 
-
         {/* TAB 4: ตารางสงคราม (Schedule) */}
         {currentTab === 'schedule' && (
           <WarScheduleView
@@ -1837,6 +2046,260 @@ export const GuildPage: React.FC = () => {
                     </div>
                   </>
                 )}
+              </div>
+            </div>
+
+            {/* Backup & Restore Data Section */}
+            <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-base font-extrabold text-white flex items-center gap-2">
+                  <Database className="w-4 h-4 text-emerald-400" />
+                  <span>สำรองและกู้คืนข้อมูล (Backup & Restore)</span>
+                </h3>
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 font-bold">
+                  ป้องกันข้อมูลหาย
+                </span>
+              </div>
+
+              <p className="text-xs text-slate-400 leading-relaxed">
+                คุณสามารถดาวน์โหลดข้อมูลโพยและสูตรทั้งหมดเก็บเป็นไฟล์ <code>.json</code> ไว้ในเครื่องคอมพิวเตอร์ได้ตลอดเวลา เพื่อความปลอดภัยเวลาอัปเดตโค้ดเวอร์ชันใหม่ หรือย้ายเซิร์ฟเวอร์
+              </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                {/* Export Button */}
+                <a
+                  href={`/api/guild/${shortId}/export`}
+                  download
+                  className="flex flex-col p-3.5 rounded-xl border border-emerald-500/30 bg-emerald-950/20 hover:bg-emerald-950/40 text-left transition-all cursor-pointer group"
+                >
+                  <div className="flex items-center gap-2 text-emerald-300 font-bold text-xs mb-1">
+                    <Download className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" />
+                    <span>📥 สำรองข้อมูล (Export JSON)</span>
+                  </div>
+                  <p className="text-[11px] text-slate-400">
+                    ดาวน์โหลดข้อมูลบ้านและสูตรแก้ทั้งหมดเก็บไว้ในเครื่อง
+                  </p>
+                </a>
+
+                {/* Import Button */}
+                {isAdmin ? (
+                  <label className="flex flex-col p-3.5 rounded-xl border border-indigo-500/30 bg-indigo-950/20 hover:bg-indigo-950/40 text-left transition-all cursor-pointer group">
+                    <input
+                      type="file"
+                      accept=".json"
+                      onChange={handleImportBackupFile}
+                      className="hidden"
+                    />
+                    <div className="flex items-center gap-2 text-indigo-300 font-bold text-xs mb-1">
+                      <Upload className="w-4 h-4 group-hover:-translate-y-0.5 transition-transform" />
+                      <span>📤 กู้คืนข้อมูล (Restore JSON)</span>
+                    </div>
+                    <p className="text-[11px] text-slate-400">
+                      นำเข้าไฟล์สำรองเพื่อกู้คืนโพยเดิมกลับมา
+                    </p>
+                  </label>
+                ) : (
+                  <div className="flex flex-col p-3.5 rounded-xl border border-slate-800 bg-slate-950/40 text-left opacity-60">
+                    <div className="flex items-center gap-2 text-slate-400 font-bold text-xs mb-1">
+                      <Upload className="w-4 h-4" />
+                      <span>📤 กู้คืนข้อมูล (แอดมินเท่านั้น)</span>
+                    </div>
+                    <p className="text-[11px] text-slate-500">
+                      เข้าสู่ระบบแอดมินเพื่อกู้คืนข้อมูลสำรอง
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Sync from 7K-Note Section */}
+            {!hasSyncedData ? (
+              <div className="rounded-2xl border border-amber-500/30 bg-gradient-to-br from-slate-900 via-amber-950/20 to-slate-900 p-5 space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-base font-extrabold text-white flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-amber-400" />
+                    <span>ซิงค์โพยเมต้าจาก 7K-Note (37 บ้าน)</span>
+                  </h3>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/20 font-bold">
+                    ยังไม่มีข้อมูลโพย
+                  </span>
+                </div>
+
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  ดึงข้อมูลบ้านศัตรูตั้งรับและสูตรแก้ทาง 37 บ้านจาก 7K-Note (ห้อง <code>4ZyeEGMZ</code>) เข้ามาในกิลด์ของคุณได้ทันที พร้อมตำแหน่งจัดแถวหน้า/หลัง, สัตว์เลี้ยง, ลำดับการกดสกิล, เซ็ตอุปกรณ์, แหวน และสเตตัสอย่างละเอียด
+                </p>
+
+                {isAdmin ? (
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-1">
+                    <button
+                      type="button"
+                      onClick={handleSync7KNote}
+                      disabled={isSyncing7KNote}
+                      className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold text-xs sm:text-sm shadow-lg shadow-amber-500/20 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                    >
+                      {isSyncing7KNote ? (
+                        <>
+                          <RefreshCw className="w-4 h-4 animate-spin text-slate-950" />
+                          <span>กำลังซิงค์โพยจาก 7K-Note...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="w-4 h-4 text-slate-950" />
+                          <span>⚡ ซิงค์โพย 37 บ้านจาก 7K-Note ตอนนี้</span>
+                        </>
+                      )}
+                    </button>
+                    <a
+                      href="https://7k-note.pages.dev/g/4ZyeEGMZ?tab=targets"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="px-3.5 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-colors"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5 text-amber-400" />
+                      <span>เปิดดูต้นฉบับ 7K-Note</span>
+                    </a>
+                  </div>
+                ) : (
+                  <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-400">
+                    🔒 ต้องเข้าสู่ระบบแอดมินเพื่อกดซิงค์โพยเข้ากิลด์นี้
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-2.5 text-xs text-slate-300">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>ดึงข้อมูลโพยและสูตรแก้ 37 บ้านเรียบร้อยแล้ว</span>
+                </div>
+                {isAdmin && (
+                  <div className="flex items-center gap-2">
+                    {showForceResync ? (
+                      <button
+                        type="button"
+                        onClick={handleSync7KNote}
+                        disabled={isSyncing7KNote}
+                        className="px-3 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/30 text-amber-300 text-[11px] font-bold cursor-pointer transition-colors"
+                      >
+                        {isSyncing7KNote ? 'กำลังซิงค์...' : 'ยืนยันซิงค์ทับอีกครั้ง'}
+                      </button>
+                    ) : null}
+                    <button
+                      type="button"
+                      onClick={() => setShowForceResync((prev) => !prev)}
+                      className="text-[11px] text-slate-400 hover:text-amber-400 underline cursor-pointer"
+                    >
+                      {showForceResync ? 'ซ่อนปุ่ม' : 'ต้องการซิงค์ทับใหม่อีกครั้ง?'}
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Supabase Database Connection & Migration Guide */}
+            <div className="rounded-2xl border border-sky-500/30 bg-gradient-to-br from-slate-900 via-sky-950/20 to-slate-900 p-5 space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-base font-extrabold text-white flex items-center gap-2">
+                  <Cloud className="w-4 h-4 text-sky-400" />
+                  <span>ฐานข้อมูลคลาวด์ Supabase (ป้องกันข้อมูลหายถาวร 100%)</span>
+                </h3>
+                {supabaseStatus?.configured ? (
+                  <span className="inline-flex items-center gap-1 text-[10px] px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-bold">
+                    <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                    เชื่อมต่อแล้ว (Cloud Sync)
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 text-[10px] px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30 font-bold">
+                    <AlertTriangle className="w-3 h-3 text-amber-400" />
+                    Local Storage (ยังไม่ต่อ Supabase)
+                  </span>
+                )}
+              </div>
+
+              <p className="text-xs text-slate-300 leading-relaxed">
+                {supabaseStatus?.configured ? (
+                  <span className="text-emerald-300 font-medium">
+                    ระบบได้เชื่อมต่อกับฐานข้อมูล Supabase PostgreSQL เรียบร้อยแล้ว! ทุกครั้งที่มีการบันทึกบ้านหรือสูตรแก้ ข้อมูลจะถูกซิงค์ขึ้น Cloud ทันที ต่อให้อัปเดตโค้ดขึ้น Render หรือรีสตาร์ตเซิร์ฟเวอร์ ข้อมูลก็จะไม่หายอย่างแน่นอน 100%
+                  </span>
+                ) : (
+                  <>
+                    เนื่องจาก Render Free Tier จะลบไฟล์ดิสก์ทุกครั้งที่มีการ deploy โค้ดใหม่ เพื่อให้ข้อมูลทีมและโพยของคุณอยู่ถาวร ให้เชื่อมต่อกับ <b>Supabase PostgreSQL (ฟรีตลอดชีพ)</b> ตามขั้นตอนด้านล่างนี้:
+                  </>
+                )}
+              </p>
+
+              <div className="space-y-3 pt-1">
+                {/* Step 1 */}
+                <div className="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="text-xs font-bold text-white flex items-center gap-1.5">
+                      <span className="w-5 h-5 rounded-full bg-sky-500/20 text-sky-300 flex items-center justify-center text-[10px]">1</span>
+                      <span>สร้างตารางใน Supabase SQL Editor</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (supabaseStatus?.sql) {
+                          navigator.clipboard.writeText(supabaseStatus.sql);
+                          setCopiedSql(true);
+                          setTimeout(() => setCopiedSql(false), 2000);
+                        }
+                      }}
+                      className="px-2.5 py-1 rounded-lg bg-sky-950 hover:bg-sky-900 border border-sky-500/30 text-sky-300 font-bold text-[11px] flex items-center gap-1 cursor-pointer transition-colors"
+                    >
+                      {copiedSql ? (
+                        <>
+                          <Check className="w-3 h-3 text-emerald-400" />
+                          <span>คัดลอกแล้ว!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-3 h-3" />
+                          <span>คัดลอก SQL</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                  <pre className="p-2.5 rounded-lg bg-slate-900 text-[11px] font-mono text-slate-300 overflow-x-auto max-h-32 border border-slate-800">
+                    {supabaseStatus?.sql || `CREATE TABLE IF NOT EXISTS guilds (\n  short_id TEXT PRIMARY KEY,\n  name TEXT NOT NULL,\n  admin_key TEXT NOT NULL,\n  combos JSONB DEFAULT '[]'::jsonb,\n  targets JSONB DEFAULT '[]'::jsonb,\n  plans JSONB DEFAULT '[]'::jsonb,\n  schedule JSONB DEFAULT '{}'::jsonb,\n  created_at TIMESTAMPTZ DEFAULT NOW(),\n  updated_at TIMESTAMPTZ DEFAULT NOW()\n);`}
+                  </pre>
+                </div>
+
+                {/* Step 2 */}
+                <div className="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 space-y-1.5 text-xs text-slate-300">
+                  <div className="font-bold text-white flex items-center gap-1.5">
+                    <span className="w-5 h-5 rounded-full bg-sky-500/20 text-sky-300 flex items-center justify-center text-[10px]">2</span>
+                    <span>ใส่ Environment Variables ใน Render Dashboard</span>
+                  </div>
+                  <p className="text-[11px] text-slate-400 leading-relaxed">
+                    ไปที่ Render Dashboard &gt; Service ของคุณ &gt; แท็บ <b>Environment</b> แล้วเพิ่ม 2 ค่านี้:
+                  </p>
+                  <div className="space-y-1 text-[11px] font-mono">
+                    <div className="p-1.5 bg-slate-900 rounded border border-slate-800 flex items-center justify-between">
+                      <span className="text-amber-400">SUPABASE_URL</span>
+                      <span className="text-slate-400">https://[your-project].supabase.co</span>
+                    </div>
+                    <div className="p-1.5 bg-slate-900 rounded border border-slate-800 flex items-center justify-between">
+                      <span className="text-amber-400">SUPABASE_KEY</span>
+                      <span className="text-slate-400">anon_key หรือ service_role_key</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Refresh connection status button */}
+                <div className="flex items-center justify-between pt-1">
+                  <div className="text-[11px] text-slate-400">
+                    {supabaseStatus?.configured ? '🟢 ฐานข้อมูลออนไลน์และพร้อมใช้งาน' : '⚪ รอการเชื่อมต่อ'}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={checkSupabase}
+                    disabled={checkingSupabase}
+                    className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold flex items-center gap-1.5 cursor-pointer disabled:opacity-50 transition-colors"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 ${checkingSupabase ? 'animate-spin' : ''}`} />
+                    <span>ตรวจสอบสถานะ</span>
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -2176,6 +2639,15 @@ export const GuildPage: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* AI Vision Screenshot Modal */}
+      <TeamScreenshotModal
+        isOpen={showAiScanModal}
+        onClose={() => setShowAiScanModal(false)}
+        mode="auto_combo"
+        onApplyTeam={handleApplyFromAiScan}
+        onDirectSaveCombo={isAdmin ? handleDirectSaveAiCombo : undefined}
+      />
     </div>
   );
 };

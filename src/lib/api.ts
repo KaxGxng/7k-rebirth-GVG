@@ -388,3 +388,57 @@ export async function updateScheduleApi(
   if (!res.ok) throw new Error(data.error || 'บันทึกตารางวอร์ไม่สำเร็จ');
   return data.schedule;
 }
+
+export function getExportGuildUrl(shortId: string): string {
+  return `/api/guild/${encodeURIComponent(shortId)}/export`;
+}
+
+export async function importGuildBackupApi(
+  shortId: string,
+  backupData: any,
+  mode: 'merge' | 'replace' = 'merge'
+): Promise<GuildData> {
+  const res = await fetch(`/api/guild/${encodeURIComponent(shortId)}/import`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Admin-Key': getAdminKey(shortId),
+    },
+    body: JSON.stringify({ ...backupData, mode }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'กู้คืนข้อมูลไม่สำเร็จ');
+  return data.guild;
+}
+
+export interface SupabaseStatus {
+  configured: boolean;
+  sql: string;
+  supabaseUrlSet: boolean;
+  supabaseKeySet: boolean;
+}
+
+export async function getSupabaseStatus(): Promise<SupabaseStatus> {
+  const res = await fetch('/api/supabase/status');
+  if (!res.ok) throw new Error('ไม่สามารถตรวจสอบสถานะ Supabase ได้');
+  return res.json();
+}
+
+export async function sync7KNoteApi(
+  shortId: string,
+  guildCode: string = '4ZyeEGMZ',
+  replace: boolean = true
+): Promise<{ ok: boolean; message: string; count: number; targets: TargetHouse[]; combos: GuildCombo[] }> {
+  const res = await fetch(`/api/guild/${encodeURIComponent(shortId)}/sync-7knote`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Admin-Key': getAdminKey(shortId),
+    },
+    body: JSON.stringify({ guildCode, replace }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'ซิงค์โพยจาก 7K-Note ไม่สำเร็จ');
+  return data;
+}
+

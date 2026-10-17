@@ -4,6 +4,14 @@ import path from 'path';
 import crypto from 'crypto';
 import { fileURLToPath } from 'url';
 import { syncGamePatchCatalog } from './patchSync.mjs';
+import {
+  isSupabaseConfigured,
+  loadGuildsFromSupabase,
+  saveGuildToSupabase,
+  deleteGuildFromSupabase,
+  SUPABASE_TABLE_SQL,
+} from './supabase.mjs';
+import { fetchAndConvert7KNote } from './noteImporter.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -322,25 +330,75 @@ function loadDb() {
     }
     for (const gid of Object.keys(data.guilds)) {
       const g = data.guilds[gid];
+      if (!g.combos) g.combos = [];
+      if (!g.targets) g.targets = [];
+      if (!g.plans) g.plans = [];
+
       if (gid === 'meta7k' && Array.isArray(g.combos)) {
         if (g.combos[0] && !g.combos[0].houseNo) {
           g.combos[0].houseNo = 1;
           g.combos[0].isFortress = true;
           g.combos[0].customName = 'ป้อมหัวกิลด์ (ถึกโรซี่)';
         }
-        if (g.combos[1] && !g.combos[1].houseNo) {
-          g.combos[1].houseNo = 2;
+        if (g.combos[1] && (!g.combos[1].houseNo || g.combos[1].houseNo === 2)) {
+          g.combos[1].houseNo = 5;
           g.combos[1].isFortress = false;
           g.combos[1].customName = 'บ้านสปีดแฝดลิง';
         }
-        if (g.combos[2] && !g.combos[2].houseNo) {
-          g.combos[2].houseNo = 3;
+        if (g.combos[2] && (!g.combos[2].houseNo || g.combos[2].houseNo === 3)) {
+          g.combos[2].houseNo = 6;
           g.combos[2].isFortress = false;
           g.combos[2].customName = 'บ้านเวทย์หลับยอนฮี';
         }
       }
-      if (!g.targets) g.targets = [];
-      if (!g.plans) g.plans = [];
+
+      // Ensure every target house and defense formula is also visible in combos
+      if (Array.isArray(g.targets) && Array.isArray(g.combos)) {
+        for (const t of g.targets) {
+          const comboId = t.id.startsWith('combo-') ? t.id : `combo-${t.id}`;
+          const existing = g.combos.find(
+            (c) => c.id === comboId || c.id === t.id || (t.houseNo && c.houseNo === t.houseNo)
+          );
+          if (!existing) {
+            g.combos.push({
+              id: comboId,
+              houseNo: t.houseNo,
+              isFortress: Boolean(t.isFortress),
+              customName: t.customName || (t.isFortress ? `ป้อม ${t.houseNo}` : `บ้านที่ ${t.houseNo}`),
+              enemyTeam: t.enemyTeam || {
+                strategyId: '1-4',
+                teamType: 'tanky',
+                skillOrder: [],
+                front: { characters: [] },
+                back: { characters: [] },
+                pets: [null, null, null, null, null],
+              },
+              counterTeams: (t.counters || []).map((c, idx) => ({
+                id: c.id || `counter-${t.id}-${idx}`,
+                order: c.order ?? idx,
+                strategyId: c.strategyId || '1-4',
+                skillOrder: c.skillOrder || [],
+                front: c.front || { characters: [] },
+                back: c.back || { characters: [] },
+                pets: c.pets || [null, null, null, null, null],
+                note: c.note || '',
+                likes: c.likes || 0,
+              })),
+              createdAt: t.createdAt || new Date().toISOString(),
+              updatedAt: t.updatedAt || new Date().toISOString(),
+            });
+          }
+        }
+        // Deduplicate combos by houseNo
+        const seenHouses = new Set();
+        g.combos = g.combos.filter((c) => {
+          if (!c.houseNo) return true;
+          if (seenHouses.has(c.houseNo)) return false;
+          seenHouses.add(c.houseNo);
+          return true;
+        });
+        g.combos.sort((a, b) => (a.houseNo || 999) - (b.houseNo || 999));
+      }
       if (!g.schedule) {
         g.schedule = {
           warDays: ['อังคาร', 'พฤหัสบดี', 'เสาร์'],
@@ -358,10 +416,24 @@ function loadDb() {
   }
 }
 
-function saveDb(db) {
+function saveDb(db, targetGuildShortId = null) {
   const tmpFile = `${DB_FILE}.tmp`;
   fs.writeFileSync(tmpFile, JSON.stringify(db, null, 2), 'utf8');
   fs.renameSync(tmpFile, DB_FILE);
+
+  if (isSupabaseConfigured()) {
+    if (targetGuildShortId && db.guilds && db.guilds[targetGuildShortId]) {
+      saveGuildToSupabase(db.guilds[targetGuildShortId]).catch((err) => {
+        console.error(`Failed to sync guild ${targetGuildShortId} to Supabase:`, err.message);
+      });
+    } else if (db.guilds) {
+      for (const guild of Object.values(db.guilds)) {
+        saveGuildToSupabase(guild).catch((err) => {
+          console.error(`Failed to sync guild ${guild.short_id} to Supabase:`, err.message);
+        });
+      }
+    }
+  }
 }
 
 function generateShortId(db) {
@@ -378,7 +450,7 @@ function generateShortId(db) {
 
 async function startServer() {
   const app = express();
-  app.use(express.json({ limit: '5mb' }));
+  app.use(express.json({ limit: '25mb' }));
 
   // Clean up duplicate equipSets / equipRings in catalog.json on boot if needed
   const catalogPath = path.join(ROOT_DIR, 'src', 'data', 'catalog.json');
@@ -409,7 +481,38 @@ async function startServer() {
   }
 
   // Ensure DB is initialized
-  loadDb();
+  const db = loadDb();
+
+  // Supabase boot sync
+  if (isSupabaseConfigured()) {
+    try {
+      console.log('🔌 Supabase is configured. Checking remote database...');
+      const remoteGuilds = await loadGuildsFromSupabase();
+      if (remoteGuilds && Object.keys(remoteGuilds).length > 0) {
+        console.log(`📥 Loaded ${Object.keys(remoteGuilds).length} guilds from Supabase.`);
+        for (const [id, rGuild] of Object.entries(remoteGuilds)) {
+          db.guilds[id] = rGuild;
+        }
+        for (const [id, lGuild] of Object.entries(db.guilds)) {
+          if (!remoteGuilds[id]) {
+            console.log(`📤 Pushing local guild "${id}" to Supabase...`);
+            await saveGuildToSupabase(lGuild);
+          }
+        }
+        saveDb(db);
+      } else if (remoteGuilds && Object.keys(remoteGuilds).length === 0) {
+        console.log('📤 Supabase table is empty. Initializing Supabase with current guilds...');
+        for (const lGuild of Object.values(db.guilds)) {
+          console.log(`📤 Seeding guild "${lGuild.short_id}" to Supabase...`);
+          await saveGuildToSupabase(lGuild);
+        }
+      }
+    } catch (err) {
+      console.warn('⚠️ Supabase initial sync warning:', err.message);
+    }
+  } else {
+    console.log('ℹ️ Running with local JSON database storage (SUPABASE_URL and SUPABASE_KEY not set).');
+  }
 
   // Check current patch metadata & Netmarble Forum updates
   app.get('/api/patch/status', (req, res) => {
@@ -755,6 +858,87 @@ async function startServer() {
     res.json({ ok: true, name: guild.name });
   });
 
+  // Export Guild Data Backup
+  app.get('/api/guild/:shortId/export', (req, res) => {
+    const { shortId } = req.params;
+    const db = loadDb();
+    const guild = db.guilds[shortId];
+    if (!guild) return res.status(404).json({ error: 'ไม่พบกิลด์นี้' });
+
+    const exportData = {
+      version: '1.0',
+      exportedAt: new Date().toISOString(),
+      short_id: guild.short_id,
+      name: guild.name,
+      combos: guild.combos || [],
+      targets: guild.targets || [],
+      plans: guild.plans || [],
+      schedule: guild.schedule || null,
+    };
+
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename="7k-gvg-backup-${shortId}-${new Date().toISOString().slice(0, 10)}.json"`
+    );
+    res.send(JSON.stringify(exportData, null, 2));
+  });
+
+  // Import / Restore Guild Data
+  app.post('/api/guild/:shortId/import', (req, res) => {
+    const { shortId } = req.params;
+    const adminKey = req.header('X-Admin-Key') || '';
+    const db = loadDb();
+    const guild = db.guilds[shortId];
+    if (!guild) return res.status(404).json({ error: 'ไม่พบกิลด์นี้' });
+    if (guild.admin_key !== adminKey) {
+      return res.status(401).json({ error: 'เฉพาะแอดมินกิลด์เท่านั้นที่สามารถกู้คืนข้อมูลได้' });
+    }
+
+    const { combos, targets, plans, schedule, mode = 'merge' } = req.body || {};
+
+    if (!Array.isArray(combos) && !Array.isArray(targets) && !schedule) {
+      return res.status(400).json({ error: 'ไฟล์ข้อมูลสำรองไม่ถูกต้อง' });
+    }
+
+    if (mode === 'replace') {
+      if (Array.isArray(combos)) guild.combos = combos;
+      if (Array.isArray(targets)) guild.targets = targets;
+      if (Array.isArray(plans)) guild.plans = plans;
+      if (schedule) guild.schedule = schedule;
+    } else {
+      // Merge mode
+      if (Array.isArray(combos)) {
+        guild.combos = guild.combos || [];
+        for (const c of combos) {
+          const idx = guild.combos.findIndex((existing) => existing.id === c.id);
+          if (idx !== -1) {
+            guild.combos[idx] = c;
+          } else {
+            guild.combos.push(c);
+          }
+        }
+      }
+      if (schedule) {
+        guild.schedule = { ...(guild.schedule || {}), ...schedule };
+      }
+    }
+
+    saveDb(db);
+    res.json({ ok: true, guild });
+  });
+
+  // Download full DB backup
+  app.get('/api/admin/backup-full', (req, res) => {
+    const db = loadDb();
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename="gvg-db-full-backup-${new Date().toISOString().slice(0, 10)}.json"`
+    );
+    res.send(JSON.stringify(db, null, 2));
+  });
+
   // Create target house
   app.post('/api/guild/:shortId/targets', (req, res) => {
     const { shortId } = req.params;
@@ -941,7 +1125,372 @@ async function startServer() {
     }
     delete db.guilds[shortId];
     saveDb(db);
+    if (isSupabaseConfigured()) {
+      deleteGuildFromSupabase(shortId).catch((err) => {
+        console.error('Error deleting guild from Supabase:', err.message);
+      });
+    }
     res.json({ ok: true });
+  });
+
+  // Supabase status & table DDL
+  app.get('/api/supabase/status', (req, res) => {
+    res.json({
+      configured: isSupabaseConfigured(),
+      sql: SUPABASE_TABLE_SQL,
+      supabaseUrlSet: Boolean(process.env.SUPABASE_URL),
+      supabaseKeySet: Boolean(
+        process.env.SUPABASE_KEY || process.env.SUPABASE_ANON_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY
+      ),
+    });
+  });
+
+  // Sync 7K-Note formulas into guild
+  app.post('/api/guild/:shortId/sync-7knote', async (req, res) => {
+    const { shortId } = req.params;
+    const adminKey = req.header('X-Admin-Key') || '';
+    const db = loadDb();
+    const guild = db.guilds[shortId];
+    if (!guild) return res.status(404).json({ error: 'ไม่พบกิลด์นี้' });
+    if (guild.admin_key !== adminKey) {
+      return res.status(401).json({ error: 'เฉพาะแอดมินกิลด์เท่านั้นที่สามารถซิงค์โพยได้' });
+    }
+    const { guildCode = '4ZyeEGMZ', replace = true } = req.body || {};
+    try {
+      const imported = await fetchAndConvert7KNote(guildCode);
+      if (replace) {
+        guild.targets = imported.targets;
+        guild.combos = imported.combos;
+      } else {
+        // Merge mode: update or append
+        guild.targets = guild.targets || [];
+        guild.combos = guild.combos || [];
+        for (const t of imported.targets) {
+          const idx = guild.targets.findIndex((x) => x.houseNo === t.houseNo);
+          if (idx >= 0) guild.targets[idx] = t;
+          else guild.targets.push(t);
+        }
+        for (const c of imported.combos) {
+          const idx = guild.combos.findIndex((x) => x.houseNo === c.houseNo);
+          if (idx >= 0) guild.combos[idx] = c;
+          else guild.combos.push(c);
+        }
+      }
+      guild.updated_at = new Date().toISOString();
+      saveDb(db, shortId);
+      res.json({
+        ok: true,
+        message: `ซิงค์โพยสำเร็จ ${imported.targets.length} บ้าน`,
+        count: imported.targets.length,
+        targets: guild.targets,
+        combos: guild.combos,
+      });
+    } catch (err) {
+      console.error('Error syncing 7k-note:', err);
+      res.status(500).json({ error: err.message || 'ซิงค์โพยล้มเหลว' });
+    }
+  });
+
+  // AI Vision Screenshot Scanner: Analyze screenshot & build team
+  app.post('/api/ai/scan-team', async (req, res) => {
+    try {
+      const { imageBase64, apiKey: clientApiKey, mode = 'enemy', demoMode } = req.body || {};
+      const apiKey = clientApiKey || process.env.GEMINI_API_KEY || '';
+
+      // Fallback/Demo mode if no API key or explicitly requested
+      if (demoMode || !apiKey) {
+        const demoPresets = [
+          {
+            strategyId: '1-4',
+            teamType: 'tanky',
+            houseNo: 1,
+            isFortress: true,
+            customName: 'ป้อม 1 (ทีมถึกโรซี่-ลูดี้)',
+            frontCharacters: [{ index: 0, name: 'ลูดี้ awake' }],
+            backCharacters: [
+              { index: 1, name: 'เกลลิดัส' },
+              { index: 2, name: 'โรซี่' },
+              { index: 3, name: 'พาลานอส' },
+              { index: 4, name: 'มิเลีย' },
+            ],
+            pets: ['อีรีน', 'วินดี้', null, null, null],
+            explanation:
+              'ตรวจพบทีมถึกเมต้า หน้า 1 หลัง 4 โดยมีลูดี้ยืนค้ำแถวหน้า และแถวหลังมีโรซี่ช่วยชุบชีวิตพร้อมเกลลิดัสแช่แข็ง',
+            recommendedCounter: {
+              strategyId: '1-4',
+              frontCharacters: [
+                { index: 0, name: 'พาลานอส', description: 'บล็อค 100% >> เลือด (ค้ำรับดาเมจแนวหน้า)' },
+              ],
+              backCharacters: [
+                { index: 1, name: 'ซองจินอู', description: 'คริ 100% >> คริดาเมจ (เจาะเกราะทะลวงทีมถึก)' },
+                { index: 2, name: 'เคลมิส awake', description: 'เร่งเทิร์นบัฟอมตะ + ล้างสถานะ' },
+                { index: 3, name: 'ยอนฮี', description: 'หลับยกทีม + ดาเมจทะลวงเวทย์' },
+                { index: 4, name: 'เมลคีร์', description: 'ลดเทิร์นบัฟอมตะของโรซี่' },
+              ],
+              pets: ['คารัม', 'ไพค์', null, null, null],
+              skillOrder: [
+                { charIndex: 1, skillType: 'B', order: 1 },
+                { charIndex: 2, skillType: 'T', order: 2 },
+                { charIndex: 1, skillType: 'T', order: 3 },
+              ],
+              note: 'เปิดด้วยสกิลล่างซองจินอูเจาะโล่ลูดี้ แล้วเร่งเทิร์นด้วยเคลมิสเพื่อปลดอมตะโรซี่',
+            },
+            isDemo: true,
+            message: 'วิเคราะห์ในโหมดตัวอย่าง (ใส่ Gemini API Key ฟรี เพื่อให้ AI วิเคราะห์รูปจริงแบบเรียลไทม์)',
+          },
+          {
+            strategyId: '2-3',
+            teamType: 'speed',
+            houseNo: 5,
+            isFortress: false,
+            customName: 'บ้านสปีดแฝดลิง',
+            frontCharacters: [
+              { index: 0, name: 'พาลานอส' },
+              { index: 1, name: 'ซุนหงอคง' },
+            ],
+            backCharacters: [
+              { index: 2, name: 'บรันซ์ & บรันเซล' },
+              { index: 3, name: 'แทโอ' },
+              { index: 4, name: 'เอซ' },
+            ],
+            pets: ['ไพค์', 'คารัม', null, null, null],
+            explanation:
+              'ตรวจพบทีมสปีดกายภาพ หน้า 2 หลัง 3 อาศัยความไวของบรันซ์ & บรันเซล และการสวนกลับของหงอคง/แทโอ',
+            recommendedCounter: {
+              strategyId: '1-4',
+              frontCharacters: [
+                { index: 0, name: 'แร็ดกริด', description: 'บล็อคสูง + ยานแม่สะท้อนดาเมจตัดสปีด' },
+              ],
+              backCharacters: [
+                { index: 1, name: 'โรซี่', description: 'ฮีลและคืนชีพอัศวิน' },
+                { index: 2, name: 'ลูดี้ awake', description: 'บัฟเกราะป้องกันทีม' },
+                { index: 3, name: 'จูริ', description: 'ดาเมจสวนกลับความเสียหาย' },
+                { index: 4, name: 'เกลลิดัส', description: 'แช่แข็งหยุดการเคลื่อนไหว' },
+              ],
+              pets: ['อีรีน', 'วินดี้', null, null, null],
+              skillOrder: [
+                { charIndex: 0, skillType: 'T', order: 1 },
+                { charIndex: 1, skillType: 'B', order: 2 },
+                { charIndex: 4, skillType: 'T', order: 3 },
+              ],
+              note: 'ใช้ทีมถึกสวนกลับรับดาเมจสปีดรอบแรก แล้วใช้เกลลิดัสแช่แข็งเพื่อหยุดสปีด',
+            },
+            isDemo: true,
+            message: 'วิเคราะห์ในโหมดตัวอย่าง (ใส่ Gemini API Key ฟรี เพื่อให้ AI วิเคราะห์รูปจริงแบบเรียลไทม์)',
+          },
+        ];
+        const chosen = demoPresets[Math.floor(Math.random() * demoPresets.length)];
+        return res.json({ ok: true, ...chosen });
+      }
+
+      if (!imageBase64) {
+        return res.status(400).json({ error: 'กรุณาส่งรูปภาพ (imageBase64)' });
+      }
+
+      let mimeType = 'image/jpeg';
+      let cleanBase64 = imageBase64;
+      if (imageBase64.includes(';base64,')) {
+        const parts = imageBase64.split(';base64,');
+        mimeType = parts[0].replace('data:', '') || 'image/jpeg';
+        cleanBase64 = parts[1];
+      }
+
+      let characterNames = [];
+      let petNames = [];
+      try {
+        const cat = JSON.parse(fs.readFileSync(catalogPath, 'utf8'));
+        characterNames = (cat.characters || []).map((c) => c.name);
+        petNames = (cat.pets || []).map((p) => p.name);
+      } catch (e) {
+        // ignore
+      }
+
+      const prompt = `You are an expert Seven Knights Re:BIRTH (7K Re:BIRTH) mobile game assistant.
+Analyze this in-game screenshot. The screenshot depicts a Seven Knights battle preparation, defense team, target house, or formation.
+
+TASK:
+1. Detect the 5 heroes forming the team and their exact positions.
+2. Match character names strictly to this list of known Seven Knights characters:
+${characterNames.slice(0, 140).join(', ')}
+(If awakened form, append 'awake' like 'ลูดี้ awake' if applicable).
+3. Identify formation StrategyId: "1-4", "2-3", "3-2", or "4-1".
+   - "1-4": slot 0 is Front; slots 1, 2, 3, 4 are Back.
+   - "2-3": slots 0, 1 are Front; slots 2, 3, 4 are Back.
+   - "3-2": slots 0, 1, 2 are Front; slots 3, 4 are Back.
+   - "4-1": slots 0, 1, 2, 3 are Front; slot 4 is Back.
+4. Detect TeamType: "tanky" | "speed" | "magic" | "physical" | "hybrid"
+5. Detect any visible pets from: ${petNames.slice(0, 40).join(', ')}
+6. If any house number (e.g. 1-30) or fortress flag is visible or indicated, extract it.
+7. Recommend an effective counter team against this detected team with 5 counter heroes, formation, skill order, and tactical advice note in Thai.
+
+Return ONLY pure valid JSON in this exact structure:
+{
+  "strategyId": "1-4",
+  "teamType": "tanky",
+  "houseNo": 1,
+  "isFortress": true,
+  "customName": "ป้อมหัวกิลด์",
+  "frontCharacters": [{ "index": 0, "name": "ลูดี้ awake" }],
+  "backCharacters": [
+    { "index": 1, "name": "โรซี่" },
+    { "index": 2, "name": "เกลลิดัส" }
+  ],
+  "pets": ["อีรีน", null, null, null, null],
+  "explanation": "วิเคราะห์ทีมที่พบในรูป...",
+  "recommendedCounter": {
+    "strategyId": "1-4",
+    "frontCharacters": [{ "index": 0, "name": "พาลานอส", "description": "บล็อค 100% ยืนค้ำ" }],
+    "backCharacters": [
+      { "index": 1, "name": "ซองจินอู", "description": "เจาะเกราะทีมถึก" }
+    ],
+    "pets": ["คารัม", null, null, null, null],
+    "skillOrder": [{ "charIndex": 1, "skillType": "B", "order": 1 }],
+    "note": "เทคนิคการตีทีมนี้..."
+  }
+}`;
+
+      // Dynamically discover which models are enabled for this specific API key
+      let candidateModels = [
+        'gemini-2.0-flash',
+        'gemini-2.5-flash',
+        'gemini-2.0-flash-lite',
+        'gemini-1.5-flash-latest',
+        'gemini-1.5-flash-8b',
+        'gemini-1.5-flash',
+        'gemini-1.5-pro-latest',
+        'gemini-1.5-pro',
+        'gemini-2.5-pro',
+      ];
+
+      try {
+        const listRes = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`,
+          { headers: { 'x-goog-api-key': apiKey } }
+        );
+        if (listRes.ok) {
+          const listData = await listRes.json();
+          const dynamicList = (listData.models || [])
+            .filter((m) => (m.supportedGenerationMethods || []).includes('generateContent'))
+            .map((m) => m.name.replace(/^models\//, ''));
+
+          if (dynamicList.length > 0) {
+            console.log('[AI Vision] Models discovered from API key:', dynamicList);
+            const preferred = [
+              'gemini-2.0-flash',
+              'gemini-2.5-flash',
+              'gemini-2.0-flash-lite',
+              'gemini-1.5-flash-latest',
+              'gemini-1.5-flash-8b',
+              'gemini-1.5-flash',
+              'gemini-1.5-pro-latest',
+              'gemini-1.5-pro',
+              'gemini-2.5-pro',
+            ];
+            dynamicList.sort((a, b) => {
+              const idxA = preferred.indexOf(a);
+              const idxB = preferred.indexOf(b);
+              if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+              if (idxA !== -1) return -1;
+              if (idxB !== -1) return 1;
+              return 0;
+            });
+            candidateModels = dynamicList;
+          }
+        } else {
+          const listErr = await listRes.json().catch(() => ({}));
+          console.warn('[AI Vision] ListModels check error:', listErr);
+          if (listErr.error?.message?.includes('API key not valid')) {
+            return res.status(400).json({
+              error: 'API Key ไม่ถูกต้อง กรุณาตรวจสอบหรือสร้าง API Key ใหม่จาก Google AI Studio (https://aistudio.google.com)',
+            });
+          }
+        }
+      } catch (err) {
+        console.warn('[AI Vision] ListModels check network error:', err.message);
+      }
+
+      let lastError = null;
+      let resultJson = null;
+
+      for (const model of candidateModels) {
+        for (const apiVer of ['v1beta', 'v1']) {
+          try {
+            const url = `https://generativelanguage.googleapis.com/${apiVer}/models/${model}:generateContent?key=${apiKey}`;
+            const response = await fetch(url, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'x-goog-api-key': apiKey,
+              },
+              body: JSON.stringify({
+                contents: [
+                  {
+                    parts: [
+                      { text: prompt },
+                      {
+                        inline_data: {
+                          mime_type: mimeType,
+                          data: cleanBase64,
+                        },
+                      },
+                    ],
+                  },
+                ],
+                generationConfig: {
+                  temperature: 0.2,
+                  response_mime_type: 'application/json',
+                },
+              }),
+            });
+
+            if (!response.ok) {
+              const errData = await response.json().catch(() => ({}));
+              lastError = errData.error?.message || response.statusText;
+              console.warn(`[AI Vision] ${apiVer} / ${model} error:`, lastError);
+              continue;
+            }
+
+            const geminiData = await response.json();
+            const candidateText = geminiData.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (candidateText) {
+              const cleanText = candidateText
+                .replace(/^```json\s*/i, '')
+                .replace(/```\s*$/, '')
+                .trim();
+              try {
+                resultJson = JSON.parse(cleanText);
+              } catch {
+                const match = cleanText.match(/\{[\s\S]*\}/);
+                if (match) resultJson = JSON.parse(match[0]);
+              }
+              if (resultJson) {
+                console.log(`[AI Vision] Success using model ${model} (${apiVer})`);
+                break;
+              }
+            }
+          } catch (err) {
+            lastError = err.message;
+            console.warn(`[AI Vision] Exception on ${apiVer}/${model}:`, err.message);
+          }
+        }
+        if (resultJson) break;
+      }
+
+      if (!resultJson) {
+        return res.status(502).json({
+          error: `Gemini API ไม่สามารถวิเคราะห์รูปได้: ${lastError || 'โปรดตรวจสอบ API Key หรือความชัดเจนของรูปภาพ'}`,
+        });
+      }
+
+      return res.json({
+        ok: true,
+        ...resultJson,
+        isDemo: false,
+      });
+    } catch (err) {
+      console.error('Error in /api/ai/scan-team:', err);
+      res.status(500).json({ error: err.message || 'เกิดข้อผิดพลาดในการประมวลผลรูปภาพ' });
+    }
   });
 
   const isProd =
