@@ -23,6 +23,11 @@ import {
   Sparkles,
   BookOpen,
   X,
+  Calendar,
+  Clock,
+  Trophy,
+  Star,
+  Settings,
 } from 'lucide-react';
 import type {
   GuildData,
@@ -30,6 +35,10 @@ import type {
   EnemyTeam,
   CounterTeam,
   TeamType,
+  TargetHouse,
+  WarPlan,
+  GuildSchedule,
+  TargetCounterTeam,
 } from '../types';
 import {
   TEAM_TYPES,
@@ -55,10 +64,22 @@ import {
   deleteGuildApi,
   saveRecentGuild,
   removeRecentGuild,
+  renameGuildApi,
+  createTargetApi,
+  updateTargetApi,
+  deleteTargetApi,
+  likeTargetCounterApi,
+  createPlanApi,
+  deletePlanApi,
+  updateScheduleApi,
 } from '../lib/api';
 import { TeamFormationView } from '../components/TeamFormationView';
 import { TeamBuilderModal } from '../components/TeamBuilderModal';
 import { CounterDetailModal } from '../components/CounterDetailModal';
+import { TargetsView } from '../components/TargetsView';
+import { TargetBuilderModal } from '../components/TargetBuilderModal';
+import { WarPlansView } from '../components/WarPlansView';
+import { WarScheduleView } from '../components/WarScheduleView';
 
 export const GuildPage: React.FC = () => {
   const { shortId = '' } = useParams<{ shortId: string }>();
@@ -80,6 +101,33 @@ export const GuildPage: React.FC = () => {
   // Selected Combo Detail View
   const [selectedComboId, setSelectedComboId] = useState<string | null>(null);
 
+  // Tab navigation state: 'targets' (default) | 'combos' | 'plans' | 'schedule' | 'settings'
+  const currentTab =
+    (searchParams.get('tab') as 'targets' | 'combos' | 'plans' | 'schedule' | 'settings') ||
+    'targets';
+
+  const setTab = (tab: 'targets' | 'combos' | 'plans' | 'schedule' | 'settings') => {
+    setSelectedComboId(null);
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set('tab', tab);
+      return next;
+    });
+  };
+
+  // Target House modal state
+  const [targetModal, setTargetModal] = useState<{
+    open: boolean;
+    target?: TargetHouse | null;
+  }>({ open: false });
+
+  // Adding counter directly to a target house
+  const [targetCounterSlot, setTargetCounterSlot] = useState<TargetHouse | null>(null);
+
+  // Rename Guild Modal
+  const [showRenameModal, setShowRenameModal] = useState(false);
+  const [renameInput, setRenameInput] = useState('');
+
   // Modals state
   const [builderModal, setBuilderModal] = useState<{
     mode: 'enemy' | 'counter';
@@ -91,6 +139,7 @@ export const GuildPage: React.FC = () => {
   const [detailCounter, setDetailCounter] = useState<{
     team: CounterTeam;
     index: number;
+    targetTitle?: string;
   } | null>(null);
 
   // Admin & Viewer Security Modals
@@ -343,6 +392,35 @@ export const GuildPage: React.FC = () => {
   };
 
   const handleSaveCounterTeam = async (counterTeam: CounterTeam) => {
+    if (targetCounterSlot) {
+      const existingCounters = targetCounterSlot.counters || [];
+      const newCounter: TargetCounterTeam = {
+        ...counterTeam,
+        likes: 0,
+        userLiked: false,
+      };
+      const nextCounters = [...existingCounters, newCounter];
+      try {
+        const updated = await updateTargetApi(shortId, targetCounterSlot.id, {
+          counters: nextCounters,
+        });
+        setGuild((prev) =>
+          prev
+            ? {
+                ...prev,
+                targets: (prev.targets || []).map((t) => (t.id === updated.id ? updated : t)),
+              }
+            : prev
+        );
+        setTargetCounterSlot(null);
+        setBuilderModal(null);
+        showToast('เพิ่มทีมแก้ในบ้านศัตรูสำเร็จ!');
+      } catch (err: any) {
+        alert(err?.message || 'เพิ่มทีมแก้ไม่สำเร็จ');
+      }
+      return;
+    }
+
     if (!selectedCombo) return;
     const existingList = [...(selectedCombo.counterTeams || [])];
     const idx = existingList.findIndex((ct) => ct.id === counterTeam.id);
@@ -423,6 +501,173 @@ export const GuildPage: React.FC = () => {
       navigate('/');
     } catch (err: any) {
       alert(err?.message || 'ลบโพยกิลด์ไม่สำเร็จ');
+    }
+  };
+
+  // Targets Handlers
+  const handleSaveTarget = async (targetData: Partial<TargetHouse>) => {
+    try {
+      if (targetModal.target) {
+        const updated = await updateTargetApi(shortId, targetModal.target.id, targetData);
+        setGuild((prev) =>
+          prev
+            ? {
+                ...prev,
+                targets: (prev.targets || []).map((t) => (t.id === updated.id ? updated : t)),
+              }
+            : prev
+        );
+        showToast('อัปเดตบ้านศัตรูสำเร็จ');
+      } else {
+        const created = await createTargetApi(shortId, targetData);
+        setGuild((prev) =>
+          prev
+            ? {
+                ...prev,
+                targets: [created, ...(prev.targets || [])],
+              }
+            : prev
+        );
+        showToast('เพิ่มบ้านศัตรูสำเร็จ');
+      }
+      setTargetModal({ open: false });
+    } catch (err: any) {
+      alert(err?.message || 'บันทึกบ้านศัตรูไม่สำเร็จ');
+    }
+  };
+
+  const handleDeleteTarget = async (targetId: string) => {
+    if (!window.confirm('ยืนยันการลบบ้านศัตรูนี้?')) return;
+    try {
+      await deleteTargetApi(shortId, targetId);
+      setGuild((prev) =>
+        prev
+          ? {
+              ...prev,
+              targets: (prev.targets || []).filter((t) => t.id !== targetId),
+            }
+          : prev
+      );
+      showToast('ลบบ้านศัตรูเรียบร้อยแล้ว');
+    } catch (err: any) {
+      alert(err?.message || 'ลบบ้านศัตรูไม่สำเร็จ');
+    }
+  };
+
+  const handleLikeTargetCounter = async (targetId: string, counterId: string) => {
+    try {
+      const res = await likeTargetCounterApi(shortId, targetId, counterId);
+      setGuild((prev) => {
+        if (!prev) return prev;
+        const nextTargets = (prev.targets || []).map((t) => {
+          if (t.id !== targetId) return t;
+          return {
+            ...t,
+            counters: (t.counters || []).map((c) =>
+              c.id === counterId ? { ...c, likes: res.likes, userLiked: true } : c
+            ),
+          };
+        });
+        return { ...prev, targets: nextTargets };
+      });
+      showToast('กด 👍 โหวตทีมที่ชนะแล้ว!');
+    } catch (err: any) {
+      alert(err?.message || 'กดไลก์ไม่สำเร็จ');
+    }
+  };
+
+  const handleUpdateTargetStars = async (targetId: string, stars: 0 | 1 | 2 | 3) => {
+    try {
+      const status = stars >= 1 ? 'cleared' : 'unattacked';
+      const updated = await updateTargetApi(shortId, targetId, { stars, status });
+      setGuild((prev) =>
+        prev
+          ? {
+              ...prev,
+              targets: (prev.targets || []).map((t) => (t.id === updated.id ? updated : t)),
+            }
+          : prev
+      );
+      showToast(`บันทึกผลการตีเป็น ${stars} ดาวเรียบร้อย`);
+    } catch (err: any) {
+      alert(err?.message || 'อัปเดตดาวไม่สำเร็จ');
+    }
+  };
+
+  const handleAssignTargetMember = async (targetId: string, memberName: string) => {
+    try {
+      const updated = await updateTargetApi(shortId, targetId, { assignedTo: memberName });
+      setGuild((prev) =>
+        prev
+          ? {
+              ...prev,
+              targets: (prev.targets || []).map((t) => (t.id === updated.id ? updated : t)),
+            }
+          : prev
+      );
+      showToast(memberName ? `ระบุ ${memberName} เป็นคนตีบ้านนี้แล้ว` : 'ยกเลิกการจองคนตีแล้ว');
+    } catch (err: any) {
+      alert(err?.message || 'ระบุคนตีไม่สำเร็จ');
+    }
+  };
+
+  // Plans Handlers
+  const handleSavePlan = async (planData: { memberName: string; slots: any[] }) => {
+    try {
+      const saved = await createPlanApi(shortId, planData);
+      setGuild((prev) => {
+        if (!prev) return prev;
+        const existingPlans = prev.plans || [];
+        const idx = existingPlans.findIndex(
+          (p) => p.id === saved.id || p.memberName.toLowerCase() === saved.memberName.toLowerCase()
+        );
+        const nextPlans =
+          idx >= 0
+            ? existingPlans.map((p, i) => (i === idx ? saved : p))
+            : [...existingPlans, saved];
+        return { ...prev, plans: nextPlans };
+      });
+      showToast('บันทึกแผนบุกเรียบร้อยแล้ว');
+    } catch (err: any) {
+      alert(err?.message || 'บันทึกแผนไม่สำเร็จ');
+    }
+  };
+
+  const handleDeletePlan = async (planId: string) => {
+    if (!window.confirm('ยืนยันการลบแผนบุกนี้?')) return;
+    try {
+      await deletePlanApi(shortId, planId);
+      setGuild((prev) =>
+        prev ? { ...prev, plans: (prev.plans || []).filter((p) => p.id !== planId) } : prev
+      );
+      showToast('ลบแผนบุกแล้ว');
+    } catch (err: any) {
+      alert(err?.message || 'ลบแผนไม่สำเร็จ');
+    }
+  };
+
+  // Schedule Handler
+  const handleUpdateSchedule = async (sched: Partial<GuildSchedule>) => {
+    try {
+      const updated = await updateScheduleApi(shortId, sched);
+      setGuild((prev) => (prev ? { ...prev, schedule: updated } : prev));
+      showToast('บันทึกตารางสงครามเรียบร้อยแล้ว');
+    } catch (err: any) {
+      alert(err?.message || 'บันทึกตารางวอร์ไม่สำเร็จ');
+    }
+  };
+
+  // Guild Rename Handler
+  const handleRenameGuild = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!renameInput.trim()) return;
+    try {
+      const res = await renameGuildApi(shortId, renameInput.trim());
+      setGuild((prev) => (prev ? { ...prev, name: res.name } : prev));
+      setShowRenameModal(false);
+      showToast('เปลี่ยนชื่อกิลด์เรียบร้อยแล้ว');
+    } catch (err: any) {
+      alert(err?.message || 'เปลี่ยนชื่อกิลด์ไม่สำเร็จ');
     }
   };
 
@@ -552,6 +797,19 @@ export const GuildPage: React.FC = () => {
                 <h1 className="font-extrabold text-base sm:text-lg text-white truncate max-w-[220px] sm:max-w-md">
                   {guild?.name}
                 </h1>
+                {isAdmin && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setRenameInput(guild?.name || '');
+                      setShowRenameModal(true);
+                    }}
+                    className="p-1 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-amber-400 transition-colors cursor-pointer"
+                    title="แก้ไขชื่อกิลด์"
+                  >
+                    <Edit3 className="w-3.5 h-3.5" />
+                  </button>
+                )}
                 {isAdmin ? (
                   <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-bold">
                     โหมดผู้ดูแล (Admin)
@@ -647,10 +905,133 @@ export const GuildPage: React.FC = () => {
         </div>
       </header>
 
+      {/* Top Tab Bar (7K Note Style) */}
+      <nav className="sticky top-[57px] z-20 border-b border-slate-800/80 bg-slate-950/95 backdrop-blur-md">
+        <div className="max-w-5xl mx-auto px-4 flex items-center gap-1.5 overflow-x-auto scrollbar-none py-2">
+          <button
+            type="button"
+            onClick={() => setTab('targets')}
+            className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+              currentTab === 'targets'
+                ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
+                : 'text-slate-400 hover:text-white hover:bg-slate-900 border border-transparent'
+            }`}
+          >
+            <Shield className="w-3.5 h-3.5" />
+            <span>บ้านศัตรู</span>
+            <span
+              className={`text-[10px] px-1.5 py-0.2 rounded-full font-extrabold ${
+                currentTab === 'targets'
+                  ? 'bg-slate-950 text-amber-400'
+                  : 'bg-slate-800 text-slate-300'
+              }`}
+            >
+              {guild?.targets?.length || 0}
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setTab('combos')}
+            className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+              currentTab === 'combos'
+                ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
+                : 'text-slate-400 hover:text-white hover:bg-slate-900 border border-transparent'
+            }`}
+          >
+            <Swords className="w-3.5 h-3.5" />
+            <span>โพยสูตรทีมแก้</span>
+            <span
+              className={`text-[10px] px-1.5 py-0.2 rounded-full font-extrabold ${
+                currentTab === 'combos'
+                  ? 'bg-slate-950 text-amber-400'
+                  : 'bg-slate-800 text-slate-300'
+              }`}
+            >
+              {guild?.combos?.length || 0}
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setTab('plans')}
+            className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+              currentTab === 'plans'
+                ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
+                : 'text-slate-400 hover:text-white hover:bg-slate-900 border border-transparent'
+            }`}
+          >
+            <Trophy className="w-3.5 h-3.5" />
+            <span>แผนสงคราม (3 ไม้)</span>
+            <span
+              className={`text-[10px] px-1.5 py-0.2 rounded-full font-extrabold ${
+                currentTab === 'plans'
+                  ? 'bg-slate-950 text-amber-400'
+                  : 'bg-slate-800 text-slate-300'
+              }`}
+            >
+              {guild?.plans?.length || 0}
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setTab('schedule')}
+            className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+              currentTab === 'schedule'
+                ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
+                : 'text-slate-400 hover:text-white hover:bg-slate-900 border border-transparent'
+            }`}
+          >
+            <Calendar className="w-3.5 h-3.5" />
+            <span>ตารางสงคราม</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setTab('settings')}
+            className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+              currentTab === 'settings'
+                ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
+                : 'text-slate-400 hover:text-white hover:bg-slate-900 border border-transparent'
+            }`}
+          >
+            <Settings className="w-3.5 h-3.5" />
+            <span>ตั้งค่ากิลด์</span>
+          </button>
+        </div>
+      </nav>
+
       {/* Main Container */}
       <main className="flex-1 max-w-5xl w-full mx-auto px-4 py-6 space-y-6">
-        {/* VIEW 1: All Enemy Combos Feed */}
-        {!selectedCombo ? (
+        {/* TAB 1: บ้านศัตรู (Targets) */}
+        {currentTab === 'targets' && (
+          <TargetsView
+            targets={guild?.targets || []}
+            isAdmin={isAdmin}
+            onAddTarget={() => setTargetModal({ open: true, target: null })}
+            onEditTarget={(target) => setTargetModal({ open: true, target })}
+            onDeleteTarget={handleDeleteTarget}
+            onAddCounterToTarget={(target) => {
+              setTargetCounterSlot(target);
+              setBuilderModal({ mode: 'counter' });
+            }}
+            onViewCounterDetail={(team, index, target) => {
+              setDetailCounter({
+                team,
+                index,
+                targetTitle: `${target.isFortress ? `ป้อมที่ ${target.houseNo}` : `บ้านเลขที่ ${target.houseNo}`}${target.customName ? ` (${target.customName})` : ''}`,
+              });
+            }}
+            onLikeCounter={handleLikeTargetCounter}
+            onUpdateStars={handleUpdateTargetStars}
+            onAssignMember={handleAssignTargetMember}
+          />
+        )}
+
+        {/* TAB 2: สูตรทีมแก้ (Combos) */}
+        {currentTab === 'combos' && (
+          !selectedCombo ? (
           <>
             {/* Search & Add Team Bar */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
@@ -1108,6 +1489,197 @@ export const GuildPage: React.FC = () => {
               )}
             </div>
           </div>
+        ))}
+
+        {/* TAB 3: แผนสงคราม (Plans) */}
+        {currentTab === 'plans' && (
+          <WarPlansView
+            plans={guild?.plans || []}
+            targets={guild?.targets || []}
+            isAdmin={isAdmin}
+            onSavePlan={handleSavePlan}
+            onDeletePlan={handleDeletePlan}
+          />
+        )}
+
+        {/* TAB 4: ตารางสงคราม (Schedule) */}
+        {currentTab === 'schedule' && (
+          <WarScheduleView
+            schedule={guild?.schedule}
+            isAdmin={isAdmin}
+            onUpdateSchedule={handleUpdateSchedule}
+          />
+        )}
+
+        {/* TAB 5: ตั้งค่ากิลด์ (Settings) */}
+        {currentTab === 'settings' && (
+          <div className="space-y-6 max-w-2xl mx-auto">
+            <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 space-y-4">
+              <h3 className="text-base font-extrabold text-white flex items-center gap-2">
+                <Settings className="w-4 h-4 text-amber-400" />
+                <span>ข้อมูลโพยกิลด์</span>
+              </h3>
+              <div className="space-y-3 text-xs">
+                <div className="flex items-center justify-between p-3 rounded-xl bg-slate-950 border border-slate-800/80">
+                  <div>
+                    <div className="text-slate-400">ชื่อกิลด์</div>
+                    <div className="text-sm font-bold text-white">{guild?.name}</div>
+                  </div>
+                  {isAdmin && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setRenameInput(guild?.name || '');
+                        setShowRenameModal(true);
+                      }}
+                      className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold flex items-center gap-1 cursor-pointer"
+                    >
+                      <Edit3 className="w-3.5 h-3.5" />
+                      <span>เปลี่ยนชื่อ</span>
+                    </button>
+                  )}
+                </div>
+
+                <div className="flex items-center justify-between p-3 rounded-xl bg-slate-950 border border-slate-800/80">
+                  <div>
+                    <div className="text-slate-400">รหัสสั้น (Short ID)</div>
+                    <div className="text-sm font-mono font-bold text-amber-400">{shortId}</div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleCopyShareLink}
+                    className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold flex items-center gap-1 cursor-pointer"
+                  >
+                    <Share2 className="w-3.5 h-3.5 text-amber-400" />
+                    <span>คัดลอกลิงก์</span>
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-3 gap-2 pt-1 text-center">
+                  <div className="p-3 rounded-xl bg-slate-950 border border-slate-800/80">
+                    <div className="text-slate-400 text-[11px]">บ้านศัตรู</div>
+                    <div className="text-lg font-extrabold text-white">
+                      {guild?.targets?.length || 0}
+                    </div>
+                  </div>
+                  <div className="p-3 rounded-xl bg-slate-950 border border-slate-800/80">
+                    <div className="text-slate-400 text-[11px]">สูตรทีมแก้</div>
+                    <div className="text-lg font-extrabold text-white">
+                      {guild?.combos?.length || 0}
+                    </div>
+                  </div>
+                  <div className="p-3 rounded-xl bg-slate-950 border border-slate-800/80">
+                    <div className="text-slate-400 text-[11px]">แผนจัดตี (3 ไม้)</div>
+                    <div className="text-lg font-extrabold text-white">
+                      {guild?.plans?.length || 0}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Admin & Security Section */}
+            <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 space-y-4">
+              <h3 className="text-base font-extrabold text-white flex items-center gap-2">
+                <KeyRound className="w-4 h-4 text-amber-400" />
+                <span>สิทธิ์และความปลอดภัย (Security)</span>
+              </h3>
+              <div className="space-y-3 text-xs">
+                <div className="flex items-center justify-between p-3 rounded-xl bg-slate-950 border border-slate-800/80">
+                  <div>
+                    <div className="font-bold text-white">
+                      {isAdmin
+                        ? 'กำลังใช้งานในโหมดผู้ดูแล (Admin)'
+                        : 'กำลังใช้งานในโหมดสมาชิก (Viewer)'}
+                    </div>
+                    <div className="text-slate-400 text-[11px]">
+                      {isAdmin
+                        ? 'คุณสามารถเพิ่ม/แก้ไข/ลบทีม และจัดการบ้านศัตรูได้ทั้งหมด'
+                        : 'คุณสามารถเข้าดูและกดไลก์ทีมแก้ได้ แต่ต้องใช้รหัสแอดมินเพื่อแก้ไขข้อมูล'}
+                    </div>
+                  </div>
+                  {isAdmin ? (
+                    <button
+                      type="button"
+                      onClick={handleAdminLogout}
+                      className="px-3 py-1.5 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-300 font-bold cursor-pointer"
+                    >
+                      ออกจากแอดมิน
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setShowAdminLoginModal(true)}
+                      className="px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 font-bold cursor-pointer"
+                    >
+                      ล็อกอินแอดมิน
+                    </button>
+                  )}
+                </div>
+
+                {isAdmin && (
+                  <>
+                    <div className="flex items-center justify-between p-3 rounded-xl bg-slate-950 border border-slate-800/80">
+                      <div>
+                        <div className="font-bold text-white">รหัสผ่านผู้ดูแลกิลด์ (Admin Key)</div>
+                        <div className="text-slate-400 text-[11px]">
+                          เปลี่ยนรหัสแอดมินสำหรับส่งต่อให้หัวหน้ากิลด์คนอื่น
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setNewAdminPass(getAdminKey(shortId));
+                          setShowSetupModal(true);
+                        }}
+                        className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold cursor-pointer"
+                      >
+                        เปลี่ยนรหัส
+                      </button>
+                    </div>
+
+                    <div className="flex items-center justify-between p-3 rounded-xl bg-slate-950 border border-slate-800/80">
+                      <div>
+                        <div className="font-bold text-white">
+                          รหัสล็อกดูโพยสำหรับสมาชิก: {guild?.viewer_locked ? 'เปิดใช้งานอยู่' : 'ปิดอยู่'}
+                        </div>
+                        <div className="text-slate-400 text-[11px]">
+                          ล็อกไม่ให้คนนอกที่ไม่มีรหัสผ่านเข้าดูข้อมูลโพยนี้
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setShowViewerLockModal(true)}
+                        className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold cursor-pointer"
+                      >
+                        ตั้งค่า
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Danger zone */}
+            {isAdmin && shortId !== 'meta7k' && (
+              <div className="rounded-2xl border border-rose-500/30 bg-rose-950/20 p-5 space-y-3">
+                <h3 className="text-sm font-bold text-rose-300 flex items-center gap-2">
+                  <Trash2 className="w-4 h-4" />
+                  <span>ลบโพยกิลด์นี้อย่างถาวร</span>
+                </h3>
+                <p className="text-xs text-rose-200/70">
+                  เมื่อลบแล้ว ข้อมูลบ้านศัตรู แผนสงคราม และสูตรแก้ทางทั้งหมดจะหายไปและไม่สามารถกู้คืนได้
+                </p>
+                <button
+                  type="button"
+                  onClick={handleDeleteEntireGuild}
+                  className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold cursor-pointer"
+                >
+                  ยืนยันการลบโพยกิลด์
+                </button>
+              </div>
+            )}
+          </div>
         )}
       </main>
 
@@ -1125,16 +1697,85 @@ export const GuildPage: React.FC = () => {
         </footer>
       )}
 
+      {/* Modal: Target House Builder */}
+      {targetModal.open && (
+        <TargetBuilderModal
+          initialTarget={targetModal.target}
+          onClose={() => setTargetModal({ open: false, target: null })}
+          onSave={handleSaveTarget}
+        />
+      )}
+
       {/* Modal: Team Builder (Enemy or Counter) */}
       {builderModal && (
         <TeamBuilderModal
           mode={builderModal.mode}
           initialEnemyTeam={builderModal.initialEnemy}
           initialCounterTeam={builderModal.initialCounter}
-          onClose={() => setBuilderModal(null)}
+          onClose={() => {
+            setBuilderModal(null);
+            setTargetCounterSlot(null);
+          }}
           onSaveEnemy={handleSaveEnemyTeam}
           onSaveCounter={handleSaveCounterTeam}
         />
+      )}
+
+      {/* Modal: Rename Guild */}
+      {showRenameModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4"
+          onClick={() => setShowRenameModal(false)}
+        >
+          <div
+            className="w-full max-w-md rounded-2xl border border-slate-700 bg-slate-900 p-5 space-y-4 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-bold text-white flex items-center gap-2">
+                <Edit3 className="w-4 h-4 text-amber-400" />
+                <span>แก้ไขชื่อกิลด์</span>
+              </h3>
+              <button
+                type="button"
+                onClick={() => setShowRenameModal(false)}
+                className="text-slate-400 hover:text-white cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleRenameGuild} className="space-y-3">
+              <div>
+                <label className="block text-xs text-slate-400 mb-1">ชื่อกิลด์</label>
+                <input
+                  type="text"
+                  value={renameInput}
+                  onChange={(e) => setRenameInput(e.target.value)}
+                  placeholder="ระบุชื่อกิลด์..."
+                  className="w-full rounded-xl bg-slate-950 border border-slate-700 px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
+                  autoFocus
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowRenameModal(false)}
+                  className="px-4 py-2 rounded-xl bg-slate-800 text-xs font-semibold text-slate-300 cursor-pointer"
+                >
+                  ยกเลิก
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 rounded-xl bg-amber-500 text-slate-950 text-xs font-bold cursor-pointer"
+                >
+                  บันทึกชื่อกิลด์
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
 
       {/* Modal: Counter Team Full Detail */}

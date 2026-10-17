@@ -1,4 +1,12 @@
-import type { GuildData, GuildCombo, EnemyTeam, CounterTeam } from '../types';
+import type {
+  GuildData,
+  GuildCombo,
+  EnemyTeam,
+  CounterTeam,
+  TargetHouse,
+  WarPlan,
+  GuildSchedule,
+} from '../types';
 
 export interface RecentGuild {
   short_id: string;
@@ -240,4 +248,136 @@ export async function deleteGuildApi(shortId: string): Promise<void> {
     const data = await res.json().catch(() => ({}));
     throw new Error(data.error || 'ลบโพยกิลด์ไม่สำเร็จ');
   }
+}
+
+export async function renameGuildApi(shortId: string, name: string): Promise<{ ok: boolean; name: string }> {
+  const res = await fetch(`/api/guild/${encodeURIComponent(shortId)}/name`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Admin-Key': getAdminKey(shortId),
+    },
+    body: JSON.stringify({ name }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'เปลี่ยนชื่อกิลด์ไม่สำเร็จ');
+  return data;
+}
+
+export async function createTargetApi(
+  shortId: string,
+  targetData: Partial<TargetHouse>
+): Promise<TargetHouse> {
+  const res = await fetch(`/api/guild/${encodeURIComponent(shortId)}/targets`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Admin-Key': getAdminKey(shortId),
+    },
+    body: JSON.stringify(targetData),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'เพิ่มบ้านศัตรูไม่สำเร็จ');
+  return data;
+}
+
+export async function updateTargetApi(
+  shortId: string,
+  targetId: string,
+  payload: Partial<TargetHouse>
+): Promise<TargetHouse> {
+  const res = await fetch(
+    `/api/guild/${encodeURIComponent(shortId)}/targets/${encodeURIComponent(targetId)}`,
+    {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Admin-Key': getAdminKey(shortId),
+      },
+      body: JSON.stringify(payload),
+    }
+  );
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'อัปเดตข้อมูลบ้านศัตรูไม่สำเร็จ');
+  return data;
+}
+
+export async function deleteTargetApi(shortId: string, targetId: string): Promise<void> {
+  const res = await fetch(
+    `/api/guild/${encodeURIComponent(shortId)}/targets/${encodeURIComponent(targetId)}`,
+    {
+      method: 'DELETE',
+      headers: {
+        'X-Admin-Key': getAdminKey(shortId),
+      },
+    }
+  );
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || 'ลบบ้านศัตรูไม่สำเร็จ');
+  }
+}
+
+export async function likeTargetCounterApi(
+  shortId: string,
+  targetId: string,
+  counterId: string
+): Promise<{ ok: boolean; likes: number }> {
+  const res = await fetch(
+    `/api/guild/${encodeURIComponent(shortId)}/targets/${encodeURIComponent(
+      targetId
+    )}/counters/${encodeURIComponent(counterId)}/like`,
+    {
+      method: 'POST',
+    }
+  );
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'กดไลก์ไม่สำเร็จ');
+  return data;
+}
+
+export async function createPlanApi(
+  shortId: string,
+  plan: { memberName: string; slots: any[] }
+): Promise<WarPlan> {
+  const res = await fetch(`/api/guild/${encodeURIComponent(shortId)}/plans`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(plan),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'บันทึกแผนไม่สำเร็จ');
+  return data;
+}
+
+export async function deletePlanApi(shortId: string, planId: string): Promise<void> {
+  const res = await fetch(
+    `/api/guild/${encodeURIComponent(shortId)}/plans/${encodeURIComponent(planId)}`,
+    {
+      method: 'DELETE',
+    }
+  );
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || 'ลบแผนไม่สำเร็จ');
+  }
+}
+
+export async function updateScheduleApi(
+  shortId: string,
+  schedule: Partial<GuildSchedule>
+): Promise<GuildSchedule> {
+  const res = await fetch(`/api/guild/${encodeURIComponent(shortId)}/schedule`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Admin-Key': getAdminKey(shortId),
+    },
+    body: JSON.stringify(schedule),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'บันทึกตารางวอร์ไม่สำเร็จ');
+  return data.schedule;
 }

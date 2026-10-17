@@ -311,6 +311,20 @@ function loadDb() {
       data.guilds.meta7k = seed.guilds.meta7k;
       saveDb(data);
     }
+    for (const gid of Object.keys(data.guilds)) {
+      const g = data.guilds[gid];
+      if (!g.targets) g.targets = [];
+      if (!g.plans) g.plans = [];
+      if (!g.schedule) {
+        g.schedule = {
+          warDays: ['อังคาร', 'พฤหัสบดี', 'เสาร์'],
+          warStartTime: '12:00',
+          warEndTime: '23:59',
+          currentSeasonName: 'Season 1 (พรีซีซัน)',
+          announcement: 'อย่าลืมตีให้ครบคนละ 3 ไม้ก่อน 23:59 น. นะครับ!',
+        };
+      }
+    }
     return data;
   } catch (err) {
     console.error('Error loading DB, re-initializing seed:', err);
@@ -599,6 +613,15 @@ async function startServer() {
       viewer_key: isAdmin ? guild.viewer_key : undefined,
       is_admin: isAdmin,
       combos: guild.combos || [],
+      targets: guild.targets || [],
+      plans: guild.plans || [],
+      schedule: guild.schedule || {
+        warDays: ['อังคาร', 'พฤหัสบดี', 'เสาร์'],
+        warStartTime: '12:00',
+        warEndTime: '23:59',
+        currentSeasonName: 'Season 1 (พรีซีซัน)',
+        announcement: 'อย่าลืมตีให้ครบคนละ 3 ไม้ก่อน 23:59 น. นะครับ!',
+      },
     });
   });
 
@@ -679,6 +702,199 @@ async function startServer() {
     guild.combos = (guild.combos || []).filter((c) => c.id !== comboId);
     saveDb(db);
     res.json({ ok: true });
+  });
+
+  // Rename guild
+  app.put('/api/guild/:shortId/name', (req, res) => {
+    const { shortId } = req.params;
+    const adminKey = req.header('X-Admin-Key') || '';
+    const { name } = req.body || {};
+    const db = loadDb();
+    const guild = db.guilds[shortId];
+    if (!guild) return res.status(404).json({ error: 'ไม่พบกิลด์นี้' });
+    if (guild.admin_key !== adminKey) {
+      return res.status(401).json({ error: 'รหัสแอดมินไม่ถูกต้อง' });
+    }
+    if (!name || !String(name).trim()) {
+      return res.status(400).json({ error: 'กรุณาระบุชื่อกิลด์' });
+    }
+    guild.name = String(name).trim().slice(0, 50);
+    saveDb(db);
+    res.json({ ok: true, name: guild.name });
+  });
+
+  // Create target house
+  app.post('/api/guild/:shortId/targets', (req, res) => {
+    const { shortId } = req.params;
+    const adminKey = req.header('X-Admin-Key') || '';
+    const db = loadDb();
+    const guild = db.guilds[shortId];
+    if (!guild) return res.status(404).json({ error: 'ไม่พบกิลด์นี้' });
+    if (guild.admin_key !== adminKey) {
+      return res.status(401).json({ error: 'เฉพาะแอดมินกิลด์เท่านั้นที่สามารถเพิ่มบ้านศัตรูได้' });
+    }
+    guild.targets = guild.targets || [];
+    const { houseNo, customName, isFortress, enemyTeam, tags, note, counters } = req.body || {};
+    if (!enemyTeam) {
+      return res.status(400).json({ error: 'ข้อมูลทีมตั้งรับไม่ถูกต้อง' });
+    }
+    const now = new Date().toISOString();
+    const newTarget = {
+      id: `target-${crypto.randomUUID().slice(0, 8)}`,
+      houseNo: Number(houseNo) || guild.targets.length + 1,
+      customName: customName ? String(customName).trim() : '',
+      isFortress: Boolean(isFortress),
+      stars: 0,
+      status: 'unattacked',
+      tags: Array.isArray(tags) ? tags : [],
+      note: note ? String(note).trim() : '',
+      enemyTeam,
+      counters: Array.isArray(counters) ? counters : [],
+      createdAt: now,
+      updatedAt: now,
+    };
+    guild.targets.unshift(newTarget);
+    saveDb(db);
+    res.json(newTarget);
+  });
+
+  // Update target house
+  app.put('/api/guild/:shortId/targets/:targetId', (req, res) => {
+    const { shortId, targetId } = req.params;
+    const adminKey = req.header('X-Admin-Key') || '';
+    const db = loadDb();
+    const guild = db.guilds[shortId];
+    if (!guild) return res.status(404).json({ error: 'ไม่พบกิลด์นี้' });
+    guild.targets = guild.targets || [];
+    const idx = guild.targets.findIndex((t) => t.id === targetId);
+    if (idx === -1) return res.status(404).json({ error: 'ไม่พบข้อมูลบ้านศัตรูนี้' });
+
+    const isAdmin = guild.admin_key === adminKey;
+    const existing = guild.targets[idx];
+    const {
+      houseNo,
+      customName,
+      isFortress,
+      stars,
+      status,
+      tags,
+      note,
+      enemyTeam,
+      counters,
+      assignedTo,
+    } = req.body || {};
+
+    if (!isAdmin && (enemyTeam || houseNo !== undefined)) {
+      return res.status(401).json({ error: 'เฉพาะแอดมินที่สามารถแก้ไขทีมตั้งรับของบ้านได้' });
+    }
+
+    const updated = {
+      ...existing,
+      houseNo: houseNo !== undefined ? Number(houseNo) : existing.houseNo,
+      customName: customName !== undefined ? String(customName).trim() : existing.customName,
+      isFortress: isFortress !== undefined ? Boolean(isFortress) : existing.isFortress,
+      stars: stars !== undefined ? Number(stars) : existing.stars,
+      status: status || existing.status,
+      tags: tags !== undefined ? (Array.isArray(tags) ? tags : []) : existing.tags,
+      note: note !== undefined ? String(note).trim() : existing.note,
+      enemyTeam: enemyTeam || existing.enemyTeam,
+      counters: counters !== undefined ? counters : existing.counters,
+      assignedTo: assignedTo !== undefined ? String(assignedTo).trim() : existing.assignedTo,
+      updatedAt: new Date().toISOString(),
+    };
+    guild.targets[idx] = updated;
+    saveDb(db);
+    res.json(updated);
+  });
+
+  // Delete target house
+  app.delete('/api/guild/:shortId/targets/:targetId', (req, res) => {
+    const { shortId, targetId } = req.params;
+    const adminKey = req.header('X-Admin-Key') || '';
+    const db = loadDb();
+    const guild = db.guilds[shortId];
+    if (!guild) return res.status(404).json({ error: 'ไม่พบกิลด์นี้' });
+    if (guild.admin_key !== adminKey) {
+      return res.status(401).json({ error: 'เฉพาะแอดมินกิลด์เท่านั้นที่สามารถลบบ้านศัตรูได้' });
+    }
+    guild.targets = (guild.targets || []).filter((t) => t.id !== targetId);
+    saveDb(db);
+    res.json({ ok: true });
+  });
+
+  // Like a counter in target house
+  app.post('/api/guild/:shortId/targets/:targetId/counters/:counterId/like', (req, res) => {
+    const { shortId, targetId, counterId } = req.params;
+    const db = loadDb();
+    const guild = db.guilds[shortId];
+    if (!guild) return res.status(404).json({ error: 'ไม่พบกิลด์นี้' });
+    guild.targets = guild.targets || [];
+    const target = guild.targets.find((t) => t.id === targetId);
+    if (!target) return res.status(404).json({ error: 'ไม่พบข้อมูลบ้านศัตรูนี้' });
+    const counter = (target.counters || []).find((c) => c.id === counterId);
+    if (!counter) return res.status(404).json({ error: 'ไม่พบทีมแก้นี้' });
+
+    counter.likes = (counter.likes || 0) + 1;
+    saveDb(db);
+    res.json({ ok: true, likes: counter.likes });
+  });
+
+  // Plans: Add or Update Plan
+  app.post('/api/guild/:shortId/plans', (req, res) => {
+    const { shortId } = req.params;
+    const db = loadDb();
+    const guild = db.guilds[shortId];
+    if (!guild) return res.status(404).json({ error: 'ไม่พบกิลด์นี้' });
+    guild.plans = guild.plans || [];
+    const { memberName, slots } = req.body || {};
+    if (!memberName || !String(memberName).trim()) {
+      return res.status(400).json({ error: 'กรุณาระบุชื่อสมาชิก' });
+    }
+    const cleanName = String(memberName).trim();
+    const existingIdx = guild.plans.findIndex(
+      (p) => p.memberName.toLowerCase() === cleanName.toLowerCase()
+    );
+    const now = new Date().toISOString();
+    const planObj = {
+      id:
+        existingIdx >= 0 ? guild.plans[existingIdx].id : `plan-${crypto.randomUUID().slice(0, 8)}`,
+      memberName: cleanName,
+      slots: Array.isArray(slots) ? slots : [],
+      updatedAt: now,
+    };
+    if (existingIdx >= 0) {
+      guild.plans[existingIdx] = planObj;
+    } else {
+      guild.plans.push(planObj);
+    }
+    saveDb(db);
+    res.json(planObj);
+  });
+
+  // Delete Plan
+  app.delete('/api/guild/:shortId/plans/:planId', (req, res) => {
+    const { shortId, planId } = req.params;
+    const db = loadDb();
+    const guild = db.guilds[shortId];
+    if (!guild) return res.status(404).json({ error: 'ไม่พบกิลด์นี้' });
+    guild.plans = (guild.plans || []).filter((p) => p.id !== planId);
+    saveDb(db);
+    res.json({ ok: true });
+  });
+
+  // Schedule: Update
+  app.put('/api/guild/:shortId/schedule', (req, res) => {
+    const { shortId } = req.params;
+    const adminKey = req.header('X-Admin-Key') || '';
+    const db = loadDb();
+    const guild = db.guilds[shortId];
+    if (!guild) return res.status(404).json({ error: 'ไม่พบกิลด์นี้' });
+    if (guild.admin_key !== adminKey) {
+      return res.status(401).json({ error: 'เฉพาะแอดมินกิลด์เท่านั้นที่สามารถแก้ไขตารางวอร์ได้' });
+    }
+    guild.schedule = req.body || {};
+    saveDb(db);
+    res.json({ ok: true, schedule: guild.schedule });
   });
 
   // Delete guild

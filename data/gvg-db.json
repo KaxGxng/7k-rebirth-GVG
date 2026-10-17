@@ -509,6 +509,510 @@
           "createdAt": "2026-10-17T11:29:50.043Z",
           "updatedAt": "2026-10-17T11:29:50.043Z"
         }
+      ],
+      "schedule": {
+        "warDays": [
+          "อังคาร",
+          "พฤหัสบดี",
+          "เสาร์"
+        ],
+        "warStartTime": "12:00",
+        "warEndTime": "23:59",
+        "currentSeasonName": "Guild War Season 1 (พรีซีซัน)",
+        "announcement": "เป้าหมายวันนี้: ลุยเก็บป้อมปราการ 1-3 ให้แตกก่อน 21:00 น. ตีให้ครบคนละ 3 ไม้นะครับ!"
+      },
+      "targets": [
+        {
+          "id": "target-fort-1",
+          "houseNo": 1,
+          "customName": "ป้อมปราการ 1 (หัวหน้ากิลด์ศัตรู)",
+          "isFortress": true,
+          "stars": 0,
+          "status": "unattacked",
+          "tags": [
+            "แทงก์",
+            "ถึก"
+          ],
+          "note": "บ้านหนามาก ระวังลูดี้เปิดโล่สะท้อน ให้เอาซองจินอูเจาะเกราะ",
+          "assignedTo": "",
+          "enemyTeam": {
+            "strategyId": "1-4",
+            "teamType": "tanky",
+            "front": {
+              "characters": [
+                {
+                  "index": 0,
+                  "name": "ลูดี้ awake"
+                }
+              ]
+            },
+            "back": {
+              "characters": [
+                {
+                  "index": 1,
+                  "name": "เกลลิดัส"
+                },
+                {
+                  "index": 2,
+                  "name": "โรซี่"
+                }
+              ]
+            },
+            "pets": [
+              "อีรีน",
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "counters": [
+            {
+              "id": "counter-f1-1",
+              "order": 0,
+              "strategyId": "1-4",
+              "likes": 8,
+              "front": {
+                "characters": [
+                  {
+                    "index": 0,
+                    "name": "พาลานอส",
+                    "description": "บล็อค 100% >> เลือด (ยืนค้ำรับดาเมจ)",
+                    "equip": {
+                      "sets": [
+                        "นายประตู",
+                        "อัศวินศักดิ์สิทธิ์"
+                      ],
+                      "rings": [
+                        "แหวนแห่งการคีนชีพ",
+                        "แหวนอมตะ"
+                      ]
+                    }
+                  }
+                ]
+              },
+              "back": {
+                "characters": [
+                  {
+                    "index": 1,
+                    "name": "ซองจินอู",
+                    "description": "คริ 100% >> คริดาเมจ (เจาะเกราะทะลวงถึก)",
+                    "equip": {
+                      "sets": [
+                        "นักฆ่า",
+                        "ผู้ไล่ล่า"
+                      ],
+                      "rings": [
+                        "แหวนแห่งอำนาจ",
+                        "แหวนแห่งการปราบปราม"
+                      ]
+                    }
+                  },
+                  {
+                    "index": 2,
+                    "name": "เคลมิส awake",
+                    "description": "เร่งเกจบัฟ ลดคูลดาวน์ทีม",
+                    "equip": {
+                      "sets": [
+                        "ผู้พิทักษ์"
+                      ],
+                      "rings": [
+                        "แหวนเวทย์มน"
+                      ]
+                    }
+                  }
+                ]
+              },
+              "pets": [
+                "วินดี้",
+                null,
+                null,
+                null,
+                null
+              ],
+              "note": "ไม้ 1 พาลานอสยืนค้ำ ซองจินอูปาดทีเดียวลูดี้แตก ชนะ 3 ดาวแน่นอน"
+            }
+          ]
+        },
+        {
+          "id": "target-fort-2",
+          "houseNo": 2,
+          "customName": "ป้อมปราการ 2 (รองหัวหน้าศัตรู)",
+          "isFortress": true,
+          "stars": 3,
+          "status": "cleared",
+          "tags": [
+            "กายภาพ",
+            "สปีด"
+          ],
+          "note": "สปีดไวมาก คิริเอลยิงแรง",
+          "assignedTo": "กิลด์เมท Alpha",
+          "enemyTeam": {
+            "strategyId": "1-4",
+            "teamType": "physical",
+            "front": {
+              "characters": [
+                {
+                  "index": 0,
+                  "name": "อาริส awake"
+                }
+              ]
+            },
+            "back": {
+              "characters": [
+                {
+                  "index": 1,
+                  "name": "คิริเอล"
+                },
+                {
+                  "index": 2,
+                  "name": "สเปนเซอร์"
+                }
+              ]
+            },
+            "pets": [
+              "เครก",
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "counters": [
+            {
+              "id": "counter-f2-1",
+              "order": 0,
+              "strategyId": "1-4",
+              "likes": 12,
+              "front": {
+                "characters": [
+                  {
+                    "index": 0,
+                    "name": "เคิร์ท",
+                    "description": "เร่งคริ ดึงการโจมตี",
+                    "equip": {
+                      "sets": [
+                        "นายประตู"
+                      ],
+                      "rings": [
+                        "แหวนอมตะ"
+                      ]
+                    }
+                  }
+                ]
+              },
+              "back": {
+                "characters": [
+                  {
+                    "index": 1,
+                    "name": "ทันจิโร่ awake",
+                    "description": "ดาเมจแรง คริเรท 100%",
+                    "equip": {
+                      "sets": [
+                        "นักฆ่า"
+                      ],
+                      "rings": [
+                        "แหวนแห่งอำนาจ"
+                      ]
+                    }
+                  },
+                  {
+                    "index": 2,
+                    "name": "ชิโนบุ awake",
+                    "description": "ติดพิษ ลดพลังป้องกันศัตรู",
+                    "equip": {
+                      "sets": [
+                        "ผู้ไล่ล่า"
+                      ],
+                      "rings": [
+                        "แหวนความเร็ว"
+                      ]
+                    }
+                  }
+                ]
+              },
+              "pets": [
+                "เนซึโกะ",
+                null,
+                null,
+                null,
+                null
+              ],
+              "note": "ทีมดาบพิฆาตอสูร ชิโนบุลดเกราะ ทันจิโร่อัลติเก็บเรียบ ตีแตก 3 ดาวแล้ว"
+            }
+          ]
+        },
+        {
+          "id": "target-house-3",
+          "houseNo": 3,
+          "customName": "บ้านที่ 1 (NightRider)",
+          "isFortress": false,
+          "stars": 0,
+          "status": "unattacked",
+          "tags": [
+            "เวท"
+          ],
+          "note": "ทีมเวทสปีดสูง ระวังรินเปิดอัลติติดสตั้น",
+          "assignedTo": "",
+          "enemyTeam": {
+            "strategyId": "1-4",
+            "teamType": "magic",
+            "front": {
+              "characters": [
+                {
+                  "index": 0,
+                  "name": "เคลมิส awake"
+                }
+              ]
+            },
+            "back": {
+              "characters": [
+                {
+                  "index": 1,
+                  "name": "ริน"
+                },
+                {
+                  "index": 2,
+                  "name": "คาร์ม่า awake"
+                }
+              ]
+            },
+            "pets": [
+              "ยู",
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "counters": [
+            {
+              "id": "counter-h3-1",
+              "order": 0,
+              "strategyId": "1-4",
+              "likes": 5,
+              "front": {
+                "characters": [
+                  {
+                    "index": 0,
+                    "name": "ซิลเวสตา awake",
+                    "description": "ต้านทานเวท บล็อค 100%",
+                    "equip": {
+                      "sets": [
+                        "อัศวินศักดิ์สิทธิ์"
+                      ],
+                      "rings": [
+                        "แหวนกำแพงเหล็ก"
+                      ]
+                    }
+                  }
+                ]
+              },
+              "back": {
+                "characters": [
+                  {
+                    "index": 1,
+                    "name": "เซนอิซึ awake",
+                    "description": "ปราณอัสนี สปีดเร็วสุดในเกม",
+                    "equip": {
+                      "sets": [
+                        "ความเร็ว"
+                      ],
+                      "rings": [
+                        "แหวนความเร็ว"
+                      ]
+                    }
+                  },
+                  {
+                    "index": 2,
+                    "name": "กิยู awake",
+                    "description": "เสาหลักวารี กางม่านตัดดาเมจ",
+                    "equip": {
+                      "sets": [
+                        "ผู้พิทักษ์"
+                      ],
+                      "rings": [
+                        "แหวนแห่งการคีนชีพ"
+                      ]
+                    }
+                  }
+                ]
+              },
+              "pets": [
+                "ไพค์",
+                null,
+                null,
+                null,
+                null
+              ],
+              "note": "ซิลเวสตากันเวท เซนอิซึเก็บรินก่อนได้ชัวร์"
+            }
+          ]
+        },
+        {
+          "id": "target-house-4",
+          "houseNo": 4,
+          "customName": "บ้านที่ 2 (DemonHunter)",
+          "isFortress": false,
+          "stars": 2,
+          "status": "cleared",
+          "tags": [
+            "ดาบพิฆาตอสูร",
+            "กายภาพ"
+          ],
+          "note": "ระวังทันจิโร่อเวคอัลติสวนกลับแรง",
+          "assignedTo": "นักดาบเงา",
+          "enemyTeam": {
+            "strategyId": "1-4",
+            "teamType": "physical",
+            "front": {
+              "characters": [
+                {
+                  "index": 0,
+                  "name": "กิยู awake"
+                }
+              ]
+            },
+            "back": {
+              "characters": [
+                {
+                  "index": 1,
+                  "name": "ทันจิโร่ awake"
+                },
+                {
+                  "index": 2,
+                  "name": "เซนอิซึ awake"
+                }
+              ]
+            },
+            "pets": [
+              "เนซึโกะ",
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "counters": [
+            {
+              "id": "counter-h4-1",
+              "order": 0,
+              "strategyId": "1-4",
+              "likes": 7,
+              "front": {
+                "characters": [
+                  {
+                    "index": 0,
+                    "name": "ลูดี้ awake",
+                    "description": "โล่สะท้อน ยืนรับดาเมจ",
+                    "equip": {
+                      "sets": [
+                        "นายประตู"
+                      ],
+                      "rings": [
+                        "แหวนอมตะ"
+                      ]
+                    }
+                  }
+                ]
+              },
+              "back": {
+                "characters": [
+                  {
+                    "index": 1,
+                    "name": "เดลโลนส์ awake",
+                    "description": "ใบ้หมู่ ตัดจังหวะสกิล",
+                    "equip": {
+                      "sets": [
+                        "นักฆ่า"
+                      ],
+                      "rings": [
+                        "แหวนแห่งอำนาจ"
+                      ]
+                    }
+                  },
+                  {
+                    "index": 2,
+                    "name": "โรซี่",
+                    "description": "ดาเมจกายภาพหนัก",
+                    "equip": {
+                      "sets": [
+                        "ผู้ไล่ล่า"
+                      ],
+                      "rings": [
+                        "แหวนแห่งการปราบปราม"
+                      ]
+                    }
+                  }
+                ]
+              },
+              "pets": [
+                "อีรีน",
+                null,
+                null,
+                null,
+                null
+              ],
+              "note": "เดลโลนส์ใบ้ตัดสกิลทันจิโร่แล้วโรซี่ฟาดเรียบ"
+            }
+          ]
+        }
+      ],
+      "plans": [
+        {
+          "id": "plan-1",
+          "memberName": "กิลด์เมท Alpha",
+          "slots": [
+            {
+              "slotNumber": 1,
+              "targetHouseId": "target-fort-2",
+              "starsWon": 3,
+              "status": "success",
+              "note": "ตีป้อม 2 ชนะ 3 ดาวตามสูตร"
+            },
+            {
+              "slotNumber": 2,
+              "targetHouseId": "target-house-3",
+              "starsWon": 0,
+              "status": "pending",
+              "note": "รอเก็บต่อ"
+            },
+            {
+              "slotNumber": 3,
+              "targetHouseId": "target-fort-1",
+              "starsWon": 0,
+              "status": "pending",
+              "note": "รอตีปิดท้าย"
+            }
+          ]
+        },
+        {
+          "id": "plan-2",
+          "memberName": "นักดาบเงา",
+          "slots": [
+            {
+              "slotNumber": 1,
+              "targetHouseId": "target-house-4",
+              "starsWon": 2,
+              "status": "success",
+              "note": "เกือบได้ 3 ดาว ทันจิโร่อึดมาก"
+            },
+            {
+              "slotNumber": 2,
+              "targetHouseId": "",
+              "starsWon": 0,
+              "status": "pending",
+              "note": ""
+            },
+            {
+              "slotNumber": 3,
+              "targetHouseId": "",
+              "starsWon": 0,
+              "status": "pending",
+              "note": ""
+            }
+          ]
+        }
       ]
     },
     "smnun8": {

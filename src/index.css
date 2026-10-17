@@ -11,16 +11,16 @@
   }
 
   html.dark {
-    --bg-primary: #090d16;
-    --bg-card: #111827;
-    --bg-muted: #1e293b;
+    --bg-primary: #0b0f19;
+    --bg-card: #121829;
+    --bg-muted: #1a2238;
     --text-primary: #f8fafc;
     --text-muted: #94a3b8;
-    --border-color: #1f2937;
+    --border-color: #212c47;
   }
 
   body {
-    font-family: 'IBM Plex Sans Thai', 'Plus Jakarta Sans', sans-serif;
+    font-family: 'Kanit', 'IBM Plex Sans Thai', sans-serif;
     background-color: var(--bg-primary);
     color: var(--text-primary);
   }
