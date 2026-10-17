@@ -101,12 +101,12 @@ export const GuildPage: React.FC = () => {
   // Selected Combo Detail View
   const [selectedComboId, setSelectedComboId] = useState<string | null>(null);
 
-  // Tab navigation state: 'targets' (default) | 'combos' | 'plans' | 'schedule' | 'settings'
+  // Tab navigation state: 'combos' (default) | 'schedule' | 'settings'
   const currentTab =
-    (searchParams.get('tab') as 'targets' | 'combos' | 'plans' | 'schedule' | 'settings') ||
-    'targets';
+    (searchParams.get('tab') as 'combos' | 'schedule' | 'settings') ||
+    'combos';
 
-  const setTab = (tab: 'targets' | 'combos' | 'plans' | 'schedule' | 'settings') => {
+  const setTab = (tab: 'combos' | 'schedule' | 'settings') => {
     setSelectedComboId(null);
     setSearchParams((prev) => {
       const next = new URLSearchParams(prev);
@@ -134,6 +134,9 @@ export const GuildPage: React.FC = () => {
     comboId?: string;
     initialEnemy?: EnemyTeam;
     initialCounter?: CounterTeam;
+    initialHouseNo?: number;
+    initialIsFortress?: boolean;
+    initialCustomName?: string;
   } | null>(null);
 
   const [detailCounter, setDetailCounter] = useState<{
@@ -241,9 +244,37 @@ export const GuildPage: React.FC = () => {
       if (typeFilter !== 'all' && combo.enemyTeam.teamType !== typeFilter) {
         return false;
       }
-      return matchesTeamQuery(combo.enemyTeam, searchQuery);
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase().trim();
+        if (combo.houseNo && combo.houseNo.toString().includes(q)) return true;
+        if (combo.customName && combo.customName.toLowerCase().includes(q)) return true;
+        if (combo.isFortress && (q.includes('ป้อม') || q.includes('fort'))) return true;
+        if (matchesTeamQuery(combo.enemyTeam, searchQuery)) return true;
+        const matchesCounter = (combo.counterTeams || []).some((ct) =>
+          matchesTeamQuery(ct, searchQuery)
+        );
+        if (matchesCounter) return true;
+        return false;
+      }
+      return true;
     });
   }, [guild, typeFilter, searchQuery]);
+
+  const sortedCombos = useMemo(() => {
+    return [...filteredCombos].sort((a, b) => {
+      if (a.isFortress && !b.isFortress) return -1;
+      if (!a.isFortress && b.isFortress) return 1;
+      if (a.isFortress && b.isFortress) {
+        return (a.houseNo || 0) - (b.houseNo || 0);
+      }
+      if (a.houseNo && b.houseNo) {
+        return a.houseNo - b.houseNo;
+      }
+      if (a.houseNo && !b.houseNo) return -1;
+      if (!a.houseNo && b.houseNo) return 1;
+      return 0;
+    });
+  }, [filteredCombos]);
 
   // Handlers for Admin & Viewer Auth
   const handleAdminLogin = async (e: React.FormEvent) => {
@@ -340,11 +371,19 @@ export const GuildPage: React.FC = () => {
   };
 
   // Combo CRUD Handlers
-  const handleSaveEnemyTeam = async (enemyTeam: EnemyTeam) => {
+  const handleSaveEnemyTeam = async (
+    enemyTeam: EnemyTeam,
+    extra?: { houseNo?: number; isFortress?: boolean; customName?: string }
+  ) => {
     if (!guild) return;
     if (builderModal?.comboId) {
       // Edit existing enemy team
-      const updated = await updateComboApi(shortId, builderModal.comboId, { enemyTeam });
+      const updated = await updateComboApi(shortId, builderModal.comboId, {
+        enemyTeam,
+        houseNo: extra?.houseNo,
+        isFortress: extra?.isFortress,
+        customName: extra?.customName,
+      });
       setGuild((prev) =>
         prev
           ? {
@@ -353,10 +392,17 @@ export const GuildPage: React.FC = () => {
             }
           : prev
       );
-      showToast('อัปเดตข้อมูลทีมเป้าหมายแล้ว');
+      showToast('อัปเดตข้อมูลบ้านกันแล้ว');
     } else {
       // Create new enemy team
-      const created = await createComboApi(shortId, enemyTeam, []);
+      const created = await createComboApi(
+        shortId,
+        enemyTeam,
+        [],
+        extra?.houseNo,
+        extra?.isFortress,
+        extra?.customName
+      );
       setGuild((prev) =>
         prev
           ? {
@@ -366,7 +412,7 @@ export const GuildPage: React.FC = () => {
           : prev
       );
       setSelectedComboId(created.id);
-      showToast('เพิ่มทีมที่ต้องการตีเรียบร้อยแล้ว');
+      showToast('เพิ่มบ้านกันและสูตรแก้เรียบร้อยแล้ว');
     }
   };
 
@@ -907,33 +953,11 @@ export const GuildPage: React.FC = () => {
 
       {/* Top Tab Bar (7K Note Style) */}
       <nav className="sticky top-[57px] z-20 border-b border-slate-800/80 bg-slate-950/95 backdrop-blur-md">
-        <div className="max-w-5xl mx-auto px-4 flex items-center gap-1.5 overflow-x-auto scrollbar-none py-2">
-          <button
-            type="button"
-            onClick={() => setTab('targets')}
-            className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
-              currentTab === 'targets'
-                ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
-                : 'text-slate-400 hover:text-white hover:bg-slate-900 border border-transparent'
-            }`}
-          >
-            <Shield className="w-3.5 h-3.5" />
-            <span>บ้านศัตรู</span>
-            <span
-              className={`text-[10px] px-1.5 py-0.2 rounded-full font-extrabold ${
-                currentTab === 'targets'
-                  ? 'bg-slate-950 text-amber-400'
-                  : 'bg-slate-800 text-slate-300'
-              }`}
-            >
-              {guild?.targets?.length || 0}
-            </span>
-          </button>
-
+        <div className="max-w-5xl mx-auto px-4 flex items-center gap-2 overflow-x-auto scrollbar-none py-2">
           <button
             type="button"
             onClick={() => setTab('combos')}
-            className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
               currentTab === 'combos'
                 ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
                 : 'text-slate-400 hover:text-white hover:bg-slate-900 border border-transparent'
@@ -954,30 +978,8 @@ export const GuildPage: React.FC = () => {
 
           <button
             type="button"
-            onClick={() => setTab('plans')}
-            className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
-              currentTab === 'plans'
-                ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
-                : 'text-slate-400 hover:text-white hover:bg-slate-900 border border-transparent'
-            }`}
-          >
-            <Trophy className="w-3.5 h-3.5" />
-            <span>แผนสงคราม (3 ไม้)</span>
-            <span
-              className={`text-[10px] px-1.5 py-0.2 rounded-full font-extrabold ${
-                currentTab === 'plans'
-                  ? 'bg-slate-950 text-amber-400'
-                  : 'bg-slate-800 text-slate-300'
-              }`}
-            >
-              {guild?.plans?.length || 0}
-            </span>
-          </button>
-
-          <button
-            type="button"
             onClick={() => setTab('schedule')}
-            className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
               currentTab === 'schedule'
                 ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
                 : 'text-slate-400 hover:text-white hover:bg-slate-900 border border-transparent'
@@ -990,7 +992,7 @@ export const GuildPage: React.FC = () => {
           <button
             type="button"
             onClick={() => setTab('settings')}
-            className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
               currentTab === 'settings'
                 ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
                 : 'text-slate-400 hover:text-white hover:bg-slate-900 border border-transparent'
@@ -1004,30 +1006,6 @@ export const GuildPage: React.FC = () => {
 
       {/* Main Container */}
       <main className="flex-1 max-w-5xl w-full mx-auto px-4 py-6 space-y-6">
-        {/* TAB 1: บ้านศัตรู (Targets) */}
-        {currentTab === 'targets' && (
-          <TargetsView
-            targets={guild?.targets || []}
-            isAdmin={isAdmin}
-            onAddTarget={() => setTargetModal({ open: true, target: null })}
-            onEditTarget={(target) => setTargetModal({ open: true, target })}
-            onDeleteTarget={handleDeleteTarget}
-            onAddCounterToTarget={(target) => {
-              setTargetCounterSlot(target);
-              setBuilderModal({ mode: 'counter' });
-            }}
-            onViewCounterDetail={(team, index, target) => {
-              setDetailCounter({
-                team,
-                index,
-                targetTitle: `${target.isFortress ? `ป้อมที่ ${target.houseNo}` : `บ้านเลขที่ ${target.houseNo}`}${target.customName ? ` (${target.customName})` : ''}`,
-              });
-            }}
-            onLikeCounter={handleLikeTargetCounter}
-            onUpdateStars={handleUpdateTargetStars}
-            onAssignMember={handleAssignTargetMember}
-          />
-        )}
 
         {/* TAB 2: สูตรทีมแก้ (Combos) */}
         {currentTab === 'combos' && (
@@ -1041,14 +1019,14 @@ export const GuildPage: React.FC = () => {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="ค้นหาทีมศัตรูจากชื่อตัวละคร, สัตว์เลี้ยง หรือชื่อเล่น (เช่น ลิง, เกล, พาลานอส, คางแหลม, แฝด)..."
+                  placeholder="ค้นหาบ้านกัน (เช่น บ้าน 1, ป้อม 2), ชื่อตัวละคร, สัตว์เลี้ยง หรือชื่อเล่น..."
                   className="w-full pl-10 pr-9 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
                 />
                 {searchQuery && (
                   <button
                     type="button"
                     onClick={() => setSearchQuery('')}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white cursor-pointer"
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -1062,7 +1040,7 @@ export const GuildPage: React.FC = () => {
                   className="shrink-0 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs sm:text-sm shadow-lg shadow-amber-500/20 cursor-pointer"
                 >
                   <Plus className="w-4 h-4" />
-                  <span>เพิ่มทีมที่ต้องการตี</span>
+                  <span>เพิ่มบ้านกันและสูตรแก้</span>
                 </button>
               )}
             </div>
@@ -1103,29 +1081,30 @@ export const GuildPage: React.FC = () => {
               </div>
 
               <span className="text-xs text-slate-400">
-                แสดง {filteredCombos.length} ทีมเป้าหมาย
+                แสดง {sortedCombos.length} บ้าน
               </span>
             </div>
 
-            {/* Enemy Team Cards List */}
-            {filteredCombos.length === 0 ? (
+            {/* Combo Matchup Cards List */}
+            {sortedCombos.length === 0 ? (
               <div className="rounded-2xl border border-dashed border-slate-800 bg-slate-900/40 p-10 text-center space-y-3">
                 <Swords className="w-10 h-10 text-slate-600 mx-auto" />
                 <div className="text-base font-bold text-slate-300">
                   {searchQuery || typeFilter !== 'all'
-                    ? 'ไม่พบทีมศัตรูที่ตรงกับเงื่อนไขการค้นหา'
-                    : 'ยังไม่มีข้อมูลทีมศัตรูในโพยกิลด์นี้'}
+                    ? 'ไม่พบบ้านกันหรือสูตรทีมแก้ที่ตรงกับเงื่อนไขการค้นหา'
+                    : 'ยังไม่มีข้อมูลบ้านกันหรือโพยสูตรแก้ในกิลด์นี้'}
                 </div>
                 <p className="text-xs text-slate-500 max-w-md mx-auto">
                   {isAdmin
-                    ? 'กดปุ่ม "เพิ่มทีมที่ต้องการตี" เพื่อเริ่มสร้างรายการทีมป้องกันของศัตรูและเพิ่มทีมแก้ทางสำหรับสมาชิกกิลด์'
-                    : 'เข้าสู่โหมดแอดมินกิลด์เพื่อเพิ่มทีมเป้าหมายและทีมแก้ทาง'}
+                    ? 'กดปุ่ม "เพิ่มบ้านกันและสูตรแก้" เพื่อสร้างบ้านตั้งรับของศัตรูพร้อมระบุโพยทีมแก้ทาง'
+                    : 'เข้าสู่โหมดแอดมินกิลด์เพื่อเพิ่มบ้านกันและทีมแก้ทาง'}
                 </p>
               </div>
             ) : (
               <div className="grid grid-cols-1 gap-4">
-                {filteredCombos.map((combo) => {
+                {sortedCombos.map((combo) => {
                   const { enemyTeam, counterTeams = [] } = combo;
+                  const firstCounter = counterTeams[0];
                   const typeMeta = getTeamTypeMeta(enemyTeam.teamType);
                   const strat = getStrategyConfig(enemyTeam.strategyId);
 
@@ -1133,14 +1112,34 @@ export const GuildPage: React.FC = () => {
                     <div
                       key={combo.id}
                       onClick={() => setSelectedComboId(combo.id)}
-                      className="group rounded-2xl border border-slate-800/90 bg-slate-900/75 hover:bg-slate-900 hover:border-amber-500/50 p-4 sm:p-5 transition-all cursor-pointer shadow-sm"
+                      className="group rounded-2xl border border-slate-800/90 bg-slate-900/80 hover:bg-slate-900 hover:border-amber-500/50 p-4 sm:p-5 transition-all cursor-pointer shadow-md space-y-4"
                     >
-                      <div className="flex flex-wrap items-center justify-between gap-2 mb-3 pb-2.5 border-b border-slate-800/80">
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs font-extrabold text-rose-400 flex items-center gap-1">
-                            <Swords className="w-3.5 h-3.5" />
-                            <span>ทีมป้องกันศัตรู</span>
-                          </span>
+                      {/* Top Header: House / Fortress badge, Team Type, and Actions */}
+                      <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-800/80">
+                        <div className="flex flex-wrap items-center gap-2">
+                          {combo.isFortress ? (
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-gradient-to-r from-purple-500/25 to-pink-500/25 border border-purple-500/50 text-purple-300 font-extrabold text-xs shadow-sm">
+                              <span>🏰 ป้อมที่ {combo.houseNo || 1}</span>
+                              {combo.customName && (
+                                <span className="text-purple-200/80 font-normal">({combo.customName})</span>
+                              )}
+                            </span>
+                          ) : combo.houseNo ? (
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-blue-500/20 border border-blue-500/40 text-blue-300 font-extrabold text-xs">
+                              <span>🏠 บ้านที่ {combo.houseNo}</span>
+                              {combo.customName && (
+                                <span className="text-blue-200/80 font-normal">({combo.customName})</span>
+                              )}
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-800 text-slate-300 font-bold text-xs">
+                              <span>🛡️ บ้านกันทั่วไป</span>
+                              {combo.customName && (
+                                <span className="text-slate-400 font-normal">({combo.customName})</span>
+                              )}
+                            </span>
+                          )}
+
                           {typeMeta && (
                             <span
                               className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full border ${typeMeta.badgeClass}`}
@@ -1148,14 +1147,15 @@ export const GuildPage: React.FC = () => {
                               สาย{typeMeta.label}
                             </span>
                           )}
-                          <span className="text-xs px-2 py-0.5 rounded-lg bg-slate-800 text-slate-300 font-semibold">
+
+                          <span className="text-xs px-2.5 py-0.5 rounded-lg bg-slate-800 text-slate-300 font-semibold">
                             แผน {strat.id} ({strat.name})
                           </span>
                         </div>
 
                         <div className="flex items-center gap-2">
-                          <span className="px-3 py-1 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs font-bold flex items-center gap-1">
-                            <span>ทีมแก้ทาง {counterTeams.length} ทีม</span>
+                          <span className="px-3 py-1 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs font-bold flex items-center gap-1 group-hover:bg-amber-500/25 transition-colors">
+                            <span>ดูวิธีเล่น ({counterTeams.length} ทีมแก้)</span>
                             <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                           </span>
 
@@ -1171,10 +1171,13 @@ export const GuildPage: React.FC = () => {
                                     mode: 'enemy',
                                     comboId: combo.id,
                                     initialEnemy: combo.enemyTeam,
+                                    initialHouseNo: combo.houseNo,
+                                    initialIsFortress: combo.isFortress,
+                                    initialCustomName: combo.customName,
                                   })
                                 }
                                 className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 cursor-pointer"
-                                title="แก้ไขทีมศัตรู"
+                                title="แก้ไขข้อมูลบ้านกัน"
                               >
                                 <Edit3 className="w-3.5 h-3.5" />
                               </button>
@@ -1182,7 +1185,7 @@ export const GuildPage: React.FC = () => {
                                 type="button"
                                 onClick={() => handleDeleteCombo(combo.id)}
                                 className="p-1.5 rounded-lg bg-slate-800 hover:bg-rose-600 text-slate-300 hover:text-white cursor-pointer"
-                                title="ลบทีมศัตรู"
+                                title="ลบข้อมูลบ้านนี้"
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
                               </button>
@@ -1191,15 +1194,119 @@ export const GuildPage: React.FC = () => {
                         </div>
                       </div>
 
-                      {/* Formation Preview */}
-                      <TeamFormationView
-                        strategyId={enemyTeam.strategyId}
-                        frontCharacters={enemyTeam.front?.characters || []}
-                        backCharacters={enemyTeam.back?.characters || []}
-                        pets={enemyTeam.pets || []}
-                        skillOrder={enemyTeam.skillOrder || []}
-                        showSkillButtons={Boolean(enemyTeam.skillOrder?.length)}
-                      />
+                      {/* Two columns: LEFT = โพยที่แก้ (ทีมแก้ทาง), RIGHT = บ้านกัน (ทีมตั้งรับ) */}
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch">
+                        {/* Left Column: โพยที่แก้ (ทีมแก้ทาง) */}
+                        <div className="rounded-xl border border-emerald-500/30 bg-emerald-950/15 p-3.5 space-y-2.5 flex flex-col justify-between">
+                          <div>
+                            <div className="flex items-center justify-between mb-2 pb-1.5 border-b border-emerald-500/20">
+                              <div className="flex items-center gap-1.5">
+                                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                                <span className="text-xs font-extrabold text-emerald-300 flex items-center gap-1">
+                                  <span>⚡ โพยที่แก้ (ทีมแก้ทาง)</span>
+                                </span>
+                                {counterTeams.length > 0 && (
+                                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/40">
+                                    สูตร #1
+                                  </span>
+                                )}
+                              </div>
+
+                              {counterTeams.length > 1 && (
+                                <span className="text-[11px] text-amber-300/90 font-medium">
+                                  + อีก {counterTeams.length - 1} สูตรแก้
+                                </span>
+                              )}
+                            </div>
+
+                            {firstCounter ? (
+                              <div className="space-y-2">
+                                <TeamFormationView
+                                  strategyId={firstCounter.strategyId}
+                                  frontCharacters={firstCounter.front?.characters || []}
+                                  backCharacters={firstCounter.back?.characters || []}
+                                  pets={firstCounter.pets || []}
+                                  skillOrder={firstCounter.skillOrder || []}
+                                  showSkillButtons={Boolean(firstCounter.skillOrder?.length)}
+                                />
+                                {firstCounter.note && (
+                                  <div className="flex items-center gap-1.5 text-[11px] text-amber-200/90 bg-amber-500/10 border border-amber-500/20 rounded-lg px-2.5 py-1.5 mt-2">
+                                    <BookOpen className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                                    <p className="truncate">{firstCounter.note}</p>
+                                  </div>
+                                )}
+                              </div>
+                            ) : (
+                              <div className="py-6 text-center space-y-2">
+                                <div className="text-xs text-slate-400">ยังไม่มีสูตรทีมแก้สำหรับบ้านนี้</div>
+                                {isAdmin ? (
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setBuilderModal({ mode: 'counter', comboId: combo.id });
+                                    }}
+                                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs cursor-pointer"
+                                  >
+                                    <Plus className="w-3.5 h-3.5" />
+                                    <span>เพิ่มสูตรทีมแก้</span>
+                                  </button>
+                                ) : (
+                                  <span className="text-[11px] text-slate-500">
+                                    รอแอดมินหรือเพื่อนร่วมกิลด์ลงสูตรแก้
+                                  </span>
+                                )}
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="pt-2 border-t border-emerald-500/15 flex items-center justify-between text-[11px] text-emerald-400/90 font-medium">
+                            <span>คลิกการ์ดเพื่อดูอุปกรณ์ & วิธีเล่น</span>
+                            <span className="flex items-center gap-1 font-bold text-amber-300">
+                              รายละเอียด ➔
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Right Column: บ้านกัน (ทีมตั้งรับ) */}
+                        <div className="rounded-xl border border-rose-500/30 bg-rose-950/15 p-3.5 space-y-2.5 flex flex-col justify-between">
+                          <div>
+                            <div className="flex items-center justify-between mb-2 pb-1.5 border-b border-rose-500/20">
+                              <div className="flex items-center gap-1.5">
+                                <Shield className="w-3.5 h-3.5 text-rose-400" />
+                                <span className="text-xs font-extrabold text-rose-300">
+                                  🛡️ บ้านกัน (ทีมตั้งรับศัตรู)
+                                </span>
+                              </div>
+                              <span className="text-[11px] text-slate-400">
+                                แผน {strat.id} ({strat.name})
+                              </span>
+                            </div>
+
+                            <TeamFormationView
+                              strategyId={enemyTeam.strategyId}
+                              frontCharacters={enemyTeam.front?.characters || []}
+                              backCharacters={enemyTeam.back?.characters || []}
+                              pets={enemyTeam.pets || []}
+                              skillOrder={enemyTeam.skillOrder || []}
+                              showSkillButtons={Boolean(enemyTeam.skillOrder?.length)}
+                            />
+                          </div>
+
+                          <div className="pt-2 border-t border-rose-500/15 flex items-center justify-between text-[11px] text-slate-400">
+                            <span>
+                              {combo.isFortress
+                                ? `ป้อมปราการที่ ${combo.houseNo || 1}`
+                                : combo.houseNo
+                                ? `บ้านเลขที่ ${combo.houseNo}`
+                                : 'ทีมศัตรู'}
+                            </span>
+                            <span className="text-slate-400">
+                              {enemyTeam.front?.characters?.length || 0}F / {enemyTeam.back?.characters?.length || 0}B
+                            </span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   );
                 })}
@@ -1207,300 +1314,379 @@ export const GuildPage: React.FC = () => {
             )}
           </>
         ) : (
-          /* VIEW 2: Selected Combo Detail (Target Enemy Team + Counter Teams List) */
+          /* VIEW 2: Selected Combo Detail (Front/Left: Counter Teams + Back/Right: House Defense) */
           <div className="space-y-6">
-            {/* Back button bar */}
-            <div className="flex items-center justify-between">
-              <button
-                type="button"
-                onClick={() => setSelectedComboId(null)}
-                className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-slate-300 hover:text-amber-400 cursor-pointer"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                <span>กลับไปหน้ารายการทีมศัตรูทั้งหมด</span>
-              </button>
-            </div>
+            {/* Top House Bar & Back Button */}
+            <div className="flex flex-wrap items-center justify-between gap-3 p-4 rounded-2xl bg-slate-900/90 border border-slate-800 shadow-sm">
+              <div className="flex flex-wrap items-center gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => setSelectedComboId(null)}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 transition-colors cursor-pointer"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  <span>กลับหน้ารวมโพย</span>
+                </button>
 
-            {/* Target Enemy Team Card */}
-            <div className="rounded-2xl border border-rose-500/30 bg-gradient-to-b from-rose-950/20 to-slate-900 p-5 space-y-3">
-              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-3">
-                <div className="flex items-center gap-2">
-                  <span className="px-2.5 py-1 rounded-lg bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs font-extrabold">
-                    เป้าหมายที่ต้องการตี (Enemy Team)
+                {selectedCombo.isFortress ? (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-purple-500/25 to-pink-500/25 border border-purple-500/50 text-purple-300 font-extrabold text-sm shadow-sm">
+                    <span>🏰 ป้อมที่ {selectedCombo.houseNo || 1}</span>
+                    {selectedCombo.customName && (
+                      <span className="text-purple-200/80 font-normal">({selectedCombo.customName})</span>
+                    )}
                   </span>
-                  {getTeamTypeMeta(selectedCombo.enemyTeam.teamType) && (
-                    <span
-                      className={`text-xs font-bold px-2.5 py-0.5 rounded-full border ${
-                        getTeamTypeMeta(selectedCombo.enemyTeam.teamType)!.badgeClass
-                      }`}
-                    >
-                      สาย{getTeamTypeMeta(selectedCombo.enemyTeam.teamType)!.label}
-                    </span>
-                  )}
-                  <span className="text-xs text-slate-400">
-                    แผน {selectedCombo.enemyTeam.strategyId} (
-                    {getStrategyConfig(selectedCombo.enemyTeam.strategyId).name})
+                ) : selectedCombo.houseNo ? (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-500/20 border border-blue-500/40 text-blue-300 font-extrabold text-sm">
+                    <span>🏠 บ้านที่ {selectedCombo.houseNo}</span>
+                    {selectedCombo.customName && (
+                      <span className="text-blue-200/80 font-normal">({selectedCombo.customName})</span>
+                    )}
                   </span>
-                </div>
+                ) : (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 font-bold text-sm">
+                    <span>🛡️ บ้านกันทั่วไป</span>
+                    {selectedCombo.customName && (
+                      <span className="text-slate-400 font-normal">({selectedCombo.customName})</span>
+                    )}
+                  </span>
+                )}
 
-                {isAdmin && (
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setBuilderModal({
-                          mode: 'enemy',
-                          comboId: selectedCombo.id,
-                          initialEnemy: selectedCombo.enemyTeam,
-                        })
-                      }
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 cursor-pointer"
-                    >
-                      <Edit3 className="w-3.5 h-3.5" />
-                      <span>แก้ไขทีมเป้าหมาย</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteCombo(selectedCombo.id)}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-xs font-semibold text-rose-300 cursor-pointer"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                      <span>ลบ</span>
-                    </button>
-                  </div>
+                {getTeamTypeMeta(selectedCombo.enemyTeam.teamType) && (
+                  <span
+                    className={`text-xs font-bold px-2.5 py-0.5 rounded-full border ${
+                      getTeamTypeMeta(selectedCombo.enemyTeam.teamType)!.badgeClass
+                    }`}
+                  >
+                    สาย{getTeamTypeMeta(selectedCombo.enemyTeam.teamType)!.label}
+                  </span>
                 )}
               </div>
 
-              <TeamFormationView
-                strategyId={selectedCombo.enemyTeam.strategyId}
-                frontCharacters={selectedCombo.enemyTeam.front?.characters || []}
-                backCharacters={selectedCombo.enemyTeam.back?.characters || []}
-                pets={selectedCombo.enemyTeam.pets || []}
-                skillOrder={selectedCombo.enemyTeam.skillOrder || []}
-                showSkillButtons={true}
-              />
-            </div>
-
-            {/* Counter Teams Section */}
-            <div className="space-y-4">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <h2 className="text-base sm:text-lg font-extrabold text-white flex items-center gap-2">
-                    <Shield className="w-5 h-5 text-amber-400" />
-                    <span>
-                      ทีมที่ใช้ต่อสู้ได้ ({selectedCombo.counterTeams?.length || 0} ทีม)
-                    </span>
-                  </h2>
-                  <p className="text-xs text-slate-400">
-                    คลิกที่การ์ดทีมแก้ทางเพื่อดูเซ็ตอุปกรณ์ แหวน ออฟชั่นแนะนำ และวิธีเรียงสกิลแบบละเอียด
-                  </p>
-                </div>
-
-                {isAdmin && (
+              {isAdmin && (
+                <div className="flex items-center gap-2">
                   <button
                     type="button"
                     onClick={() =>
                       setBuilderModal({
-                        mode: 'counter',
+                        mode: 'enemy',
                         comboId: selectedCombo.id,
+                        initialEnemy: selectedCombo.enemyTeam,
+                        initialHouseNo: selectedCombo.houseNo,
+                        initialIsFortress: selectedCombo.isFortress,
+                        initialCustomName: selectedCombo.customName,
                       })
                     }
-                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs sm:text-sm shadow-lg shadow-amber-500/20 cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 cursor-pointer"
                   >
-                    <Plus className="w-4 h-4" />
-                    <span>เพิ่มทีมแก้ทาง</span>
+                    <Edit3 className="w-3.5 h-3.5" />
+                    <span>แก้ไขบ้านกัน</span>
                   </button>
-                )}
-              </div>
-
-              {!selectedCombo.counterTeams || selectedCombo.counterTeams.length === 0 ? (
-                <div className="rounded-2xl border border-dashed border-slate-800 bg-slate-900/40 p-8 text-center space-y-2">
-                  <p className="text-sm font-bold text-slate-300">
-                    ยังไม่มีทีมแก้ทางสำหรับทีมเป้าหมายนี้
-                  </p>
-                  {isAdmin && (
-                    <p className="text-xs text-slate-500">
-                      กดปุ่ม "เพิ่มทีมแก้ทาง" ด้านบนเพื่อแนะนำทีมที่ใช้ตีชนะทีมนี้
-                    </p>
-                  )}
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 gap-4">
-                  {[...selectedCombo.counterTeams]
-                    .sort((a, b) => a.order - b.order)
-                    .map((counter, idx, arr) => {
-                      const strat = getStrategyConfig(counter.strategyId);
-                      const allCounterChars = [
-                        ...(counter.front?.characters || []),
-                        ...(counter.back?.characters || []),
-                      ].sort((a, b) => a.index - b.index);
-
-                      return (
-                        <div
-                          key={counter.id}
-                          onClick={() => setDetailCounter({ team: counter, index: idx })}
-                          className="group rounded-2xl border border-slate-800 bg-slate-900/80 hover:bg-slate-900 hover:border-amber-500/50 p-4 sm:p-5 space-y-4 transition-all cursor-pointer"
-                        >
-                          {/* Top Row */}
-                          <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-slate-800/80">
-                            <div className="flex items-center gap-2">
-                              <span className="px-2.5 py-1 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-extrabold">
-                                ทีมแก้ทาง #{idx + 1}
-                              </span>
-                              <span className="text-xs px-2 py-0.5 rounded-lg bg-slate-800 text-slate-300 font-semibold">
-                                แผน {strat.id} ({strat.name})
-                              </span>
-                            </div>
-
-                            <div className="flex items-center gap-2">
-                              <span className="inline-flex items-center gap-1 text-xs font-bold text-amber-400">
-                                <Eye className="w-3.5 h-3.5" />
-                                <span>ดูอุปกรณ์ & วิธีเล่น</span>
-                              </span>
-
-                              {isAdmin && (
-                                <div
-                                  className="flex items-center gap-1 ml-2"
-                                  onClick={(e) => e.stopPropagation()}
-                                >
-                                  <button
-                                    type="button"
-                                    disabled={idx === 0}
-                                    onClick={() => handleMoveCounterTeam(idx, -1)}
-                                    className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-slate-300 cursor-pointer"
-                                    title="เลื่อนขึ้น"
-                                  >
-                                    <ChevronUp className="w-3.5 h-3.5" />
-                                  </button>
-                                  <button
-                                    type="button"
-                                    disabled={idx === arr.length - 1}
-                                    onClick={() => handleMoveCounterTeam(idx, 1)}
-                                    className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-slate-300 cursor-pointer"
-                                    title="เลื่อนลง"
-                                  >
-                                    <ChevronDown className="w-3.5 h-3.5" />
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() =>
-                                      setBuilderModal({
-                                        mode: 'counter',
-                                        comboId: selectedCombo.id,
-                                        initialCounter: counter,
-                                      })
-                                    }
-                                    className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 cursor-pointer"
-                                    title="แก้ไขทีมแก้ทาง"
-                                  >
-                                    <Edit3 className="w-3.5 h-3.5" />
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() => handleDeleteCounterTeam(counter.id)}
-                                    className="p-1.5 rounded-lg bg-slate-800 hover:bg-rose-600 text-slate-300 hover:text-white cursor-pointer"
-                                    title="ลบทีมแก้ทาง"
-                                  >
-                                    <Trash2 className="w-3.5 h-3.5" />
-                                  </button>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-
-                          {/* Formation & Skill Order */}
-                          <TeamFormationView
-                            strategyId={counter.strategyId}
-                            frontCharacters={counter.front?.characters || []}
-                            backCharacters={counter.back?.characters || []}
-                            pets={counter.pets || []}
-                            skillOrder={counter.skillOrder || []}
-                            showSkillButtons={true}
-                          />
-
-                          {/* Quick Summary of Note & Hero Equipment */}
-                          <div className="pt-2 border-t border-slate-800/60 space-y-2">
-                            {counter.note && (
-                              <div className="flex items-start gap-2 text-xs text-amber-200/90 bg-amber-500/10 border border-amber-500/20 rounded-xl px-3 py-2">
-                                <BookOpen className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                                <p className="line-clamp-2">{counter.note}</p>
-                              </div>
-                            )}
-
-                            {/* Compact Equipment Badges per Hero */}
-                            <div className="flex flex-wrap gap-2">
-                              {allCounterChars.map((ch) => {
-                                const sets = ch.equip?.sets || [];
-                                const rings = ch.equip?.rings || [];
-                                if (sets.length === 0 && rings.length === 0 && !ch.description) {
-                                  return null;
-                                }
-                                return (
-                                  <div
-                                    key={ch.index}
-                                    className="flex flex-wrap items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-slate-950/80 border border-slate-800 text-[11px]"
-                                  >
-                                    <span className="font-bold text-white">{ch.name}:</span>
-                                    {sets.map((s, i) => {
-                                      const sInfo = getEquipSetInfo(s);
-                                      return (
-                                        <span
-                                          key={`s-${i}`}
-                                          className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-slate-800 text-slate-200"
-                                        >
-                                          {sInfo?.imageUrl && (
-                                            <img
-                                              src={sInfo.imageUrl}
-                                              alt={s}
-                                              className="w-3.5 h-3.5 rounded object-cover"
-                                            />
-                                          )}
-                                          {s}
-                                        </span>
-                                      );
-                                    })}
-                                    {rings.map((r, i) => {
-                                      const rInfo = getEquipRingInfo(r);
-                                      return (
-                                        <span
-                                          key={`r-${i}`}
-                                          className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30"
-                                        >
-                                          {rInfo?.imageUrl && (
-                                            <img
-                                              src={rInfo.imageUrl}
-                                              alt={r}
-                                              className="w-3.5 h-3.5 rounded object-cover"
-                                            />
-                                          )}
-                                          {r}
-                                        </span>
-                                      );
-                                    })}
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteCombo(selectedCombo.id)}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-xs font-semibold text-rose-300 cursor-pointer"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>ลบ</span>
+                  </button>
                 </div>
               )}
             </div>
-          </div>
-        ))}
 
-        {/* TAB 3: แผนสงคราม (Plans) */}
-        {currentTab === 'plans' && (
-          <WarPlansView
-            plans={guild?.plans || []}
-            targets={guild?.targets || []}
-            isAdmin={isAdmin}
-            onSavePlan={handleSavePlan}
-            onDeletePlan={handleDeletePlan}
-          />
-        )}
+            {/* Grid 2 Columns: LEFT = โพยที่แก้ (ทีมแก้ทาง), RIGHT = บ้านกัน (ทีมตั้งรับ) */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+              {/* Left Column: โพยที่แก้ (ทีมแก้ทาง) */}
+              <div className="lg:col-span-7 space-y-4">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <h2 className="text-base sm:text-lg font-extrabold text-white flex items-center gap-2">
+                      <Swords className="w-5 h-5 text-emerald-400" />
+                      <span>
+                        ⚡ โพยที่แก้ (ทีมแก้ทาง) ({selectedCombo.counterTeams?.length || 0} ทีม)
+                      </span>
+                    </h2>
+                    <p className="text-xs text-slate-400">
+                      คลิกที่การ์ดทีมแก้ทางเพื่อดูเซ็ตอุปกรณ์ แหวน ออฟชั่นแนะนำ และวิธีเรียงสกิลแบบละเอียด
+                    </p>
+                  </div>
+
+                  {isAdmin && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setBuilderModal({
+                          mode: 'counter',
+                          comboId: selectedCombo.id,
+                        })
+                      }
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs sm:text-sm shadow-lg shadow-amber-500/20 cursor-pointer"
+                    >
+                      <Plus className="w-4 h-4" />
+                      <span>เพิ่มทีมแก้ทาง</span>
+                    </button>
+                  )}
+                </div>
+
+                {!selectedCombo.counterTeams || selectedCombo.counterTeams.length === 0 ? (
+                  <div className="rounded-2xl border border-dashed border-slate-800 bg-slate-900/40 p-8 text-center space-y-3">
+                    <p className="text-sm font-bold text-slate-300">
+                      ยังไม่มีทีมแก้ทางสำหรับบ้านนี้
+                    </p>
+                    {isAdmin && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setBuilderModal({
+                            mode: 'counter',
+                            comboId: selectedCombo.id,
+                          })
+                        }
+                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-500 text-slate-950 font-bold text-xs cursor-pointer"
+                      >
+                        <Plus className="w-4 h-4" />
+                        <span>เพิ่มสูตรทีมแก้</span>
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {[...selectedCombo.counterTeams]
+                      .sort((a, b) => a.order - b.order)
+                      .map((counter, idx, arr) => {
+                        const strat = getStrategyConfig(counter.strategyId);
+                        const allCounterChars = [
+                          ...(counter.front?.characters || []),
+                          ...(counter.back?.characters || []),
+                        ].sort((a, b) => a.index - b.index);
+
+                        return (
+                          <div
+                            key={counter.id}
+                            onClick={() =>
+                              setDetailCounter({
+                                team: counter,
+                                index: idx,
+                                targetTitle: selectedCombo.isFortress
+                                  ? `ป้อมที่ ${selectedCombo.houseNo || 1}${selectedCombo.customName ? ` (${selectedCombo.customName})` : ''}`
+                                  : selectedCombo.houseNo
+                                  ? `บ้านที่ ${selectedCombo.houseNo}${selectedCombo.customName ? ` (${selectedCombo.customName})` : ''}`
+                                  : `บ้านกัน${selectedCombo.customName ? ` (${selectedCombo.customName})` : ''}`,
+                              })
+                            }
+                            className="group rounded-2xl border border-emerald-500/30 bg-emerald-950/10 hover:bg-slate-900 hover:border-amber-500/50 p-4 sm:p-5 space-y-4 transition-all cursor-pointer shadow-sm"
+                          >
+                            {/* Top Row */}
+                            <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-slate-800/80">
+                              <div className="flex items-center gap-2">
+                                <span className="px-2.5 py-1 rounded-lg bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-extrabold">
+                                  ทีมแก้ทาง #{idx + 1}
+                                </span>
+                                <span className="text-xs px-2 py-0.5 rounded-lg bg-slate-800 text-slate-300 font-semibold">
+                                  แผน {strat.id} ({strat.name})
+                                </span>
+                              </div>
+
+                              <div className="flex items-center gap-2">
+                                <span className="inline-flex items-center gap-1 text-xs font-bold text-amber-400">
+                                  <Eye className="w-3.5 h-3.5" />
+                                  <span>ดูอุปกรณ์ & วิธีเล่น</span>
+                                </span>
+
+                                {isAdmin && (
+                                  <div
+                                    className="flex items-center gap-1 ml-2"
+                                    onClick={(e) => e.stopPropagation()}
+                                  >
+                                    <button
+                                      type="button"
+                                      disabled={idx === 0}
+                                      onClick={() => handleMoveCounterTeam(idx, -1)}
+                                      className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-slate-300 cursor-pointer"
+                                      title="เลื่อนขึ้น"
+                                    >
+                                      <ChevronUp className="w-3.5 h-3.5" />
+                                    </button>
+                                    <button
+                                      type="button"
+                                      disabled={idx === arr.length - 1}
+                                      onClick={() => handleMoveCounterTeam(idx, 1)}
+                                      className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-slate-300 cursor-pointer"
+                                      title="เลื่อนลง"
+                                    >
+                                      <ChevronDown className="w-3.5 h-3.5" />
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        setBuilderModal({
+                                          mode: 'counter',
+                                          comboId: selectedCombo.id,
+                                          initialCounter: counter,
+                                        })
+                                      }
+                                      className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 cursor-pointer"
+                                      title="แก้ไขทีมแก้ทาง"
+                                    >
+                                      <Edit3 className="w-3.5 h-3.5" />
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleDeleteCounterTeam(counter.id)}
+                                      className="p-1.5 rounded-lg bg-slate-800 hover:bg-rose-600 text-slate-300 hover:text-white cursor-pointer"
+                                      title="ลบทีมแก้ทาง"
+                                    >
+                                      <Trash2 className="w-3.5 h-3.5" />
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Formation & Skill Order */}
+                            <TeamFormationView
+                              strategyId={counter.strategyId}
+                              frontCharacters={counter.front?.characters || []}
+                              backCharacters={counter.back?.characters || []}
+                              pets={counter.pets || []}
+                              skillOrder={counter.skillOrder || []}
+                              showSkillButtons={true}
+                            />
+
+                            {/* Quick Summary of Note & Hero Equipment */}
+                            <div className="pt-2 border-t border-slate-800/60 space-y-2">
+                              {counter.note && (
+                                <div className="flex items-start gap-2 text-xs text-amber-200/90 bg-amber-500/10 border border-amber-500/20 rounded-xl px-3 py-2">
+                                  <BookOpen className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                                  <p className="line-clamp-2">{counter.note}</p>
+                                </div>
+                              )}
+
+                              {/* Compact Equipment Badges per Hero */}
+                              <div className="flex flex-wrap gap-2">
+                                {allCounterChars.map((ch) => {
+                                  const sets = ch.equip?.sets || [];
+                                  const rings = ch.equip?.rings || [];
+                                  if (sets.length === 0 && rings.length === 0 && !ch.description) {
+                                    return null;
+                                  }
+                                  return (
+                                    <div
+                                      key={ch.index}
+                                      className="flex flex-wrap items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-slate-950/80 border border-slate-800 text-[11px]"
+                                    >
+                                      <span className="font-bold text-white">{ch.name}:</span>
+                                      {sets.map((s, i) => {
+                                        const sInfo = getEquipSetInfo(s);
+                                        return (
+                                          <span
+                                            key={`s-${i}`}
+                                            className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-slate-800 text-slate-200"
+                                          >
+                                            {sInfo?.imageUrl && (
+                                              <img
+                                                src={sInfo.imageUrl}
+                                                alt={s}
+                                                className="w-3.5 h-3.5 rounded object-cover"
+                                              />
+                                            )}
+                                            {s}
+                                          </span>
+                                        );
+                                      })}
+                                      {rings.map((r, i) => {
+                                        const rInfo = getEquipRingInfo(r);
+                                        return (
+                                          <span
+                                            key={`r-${i}`}
+                                            className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30"
+                                          >
+                                            {rInfo?.imageUrl && (
+                                              <img
+                                                src={rInfo.imageUrl}
+                                                alt={r}
+                                                className="w-3.5 h-3.5 rounded object-cover"
+                                              />
+                                            )}
+                                            {r}
+                                          </span>
+                                        );
+                                      })}
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                  </div>
+                )}
+              </div>
+
+              {/* Right Column: บ้านกัน (ทีมตั้งรับศัตรู) */}
+              <div className="lg:col-span-5 space-y-4 lg:sticky lg:top-24">
+                <div className="rounded-2xl border border-rose-500/30 bg-gradient-to-b from-rose-950/20 to-slate-900 p-5 space-y-3 shadow-md">
+                  <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-3">
+                    <div className="flex items-center gap-2">
+                      <span className="px-2.5 py-1 rounded-lg bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs font-extrabold flex items-center gap-1">
+                        <Shield className="w-3.5 h-3.5" />
+                        <span>บ้านกัน (ทีมตั้งรับศัตรู)</span>
+                      </span>
+                    </div>
+
+                    {isAdmin && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setBuilderModal({
+                            mode: 'enemy',
+                            comboId: selectedCombo.id,
+                            initialEnemy: selectedCombo.enemyTeam,
+                            initialHouseNo: selectedCombo.houseNo,
+                            initialIsFortress: selectedCombo.isFortress,
+                            initialCustomName: selectedCombo.customName,
+                          })
+                        }
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 cursor-pointer"
+                      >
+                        <Edit3 className="w-3.5 h-3.5" />
+                        <span>แก้ไข</span>
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-2 text-xs text-slate-400">
+                    <span>
+                      {selectedCombo.isFortress
+                        ? `ป้อมปราการที่ ${selectedCombo.houseNo || 1}`
+                        : selectedCombo.houseNo
+                        ? `บ้านเลขที่ ${selectedCombo.houseNo}`
+                        : 'บ้านทั่วไป'}
+                    </span>
+                    {selectedCombo.customName && (
+                      <span className="text-amber-300 font-semibold">
+                        ({selectedCombo.customName})
+                      </span>
+                    )}
+                    <span>• แผน {selectedCombo.enemyTeam.strategyId} ({getStrategyConfig(selectedCombo.enemyTeam.strategyId).name})</span>
+                  </div>
+
+                  <TeamFormationView
+                    strategyId={selectedCombo.enemyTeam.strategyId}
+                    frontCharacters={selectedCombo.enemyTeam.front?.characters || []}
+                    backCharacters={selectedCombo.enemyTeam.back?.characters || []}
+                    pets={selectedCombo.enemyTeam.pets || []}
+                    skillOrder={selectedCombo.enemyTeam.skillOrder || []}
+                    showSkillButtons={true}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        )
+      )}
+
+
 
         {/* TAB 4: ตารางสงคราม (Schedule) */}
         {currentTab === 'schedule' && (
@@ -1555,23 +1741,17 @@ export const GuildPage: React.FC = () => {
                   </button>
                 </div>
 
-                <div className="grid grid-cols-3 gap-2 pt-1 text-center">
+                <div className="grid grid-cols-2 gap-2 pt-1 text-center">
                   <div className="p-3 rounded-xl bg-slate-950 border border-slate-800/80">
-                    <div className="text-slate-400 text-[11px]">บ้านศัตรู</div>
-                    <div className="text-lg font-extrabold text-white">
-                      {guild?.targets?.length || 0}
-                    </div>
-                  </div>
-                  <div className="p-3 rounded-xl bg-slate-950 border border-slate-800/80">
-                    <div className="text-slate-400 text-[11px]">สูตรทีมแก้</div>
+                    <div className="text-slate-400 text-[11px]">บ้านกัน / โพยสูตรแก้</div>
                     <div className="text-lg font-extrabold text-white">
                       {guild?.combos?.length || 0}
                     </div>
                   </div>
                   <div className="p-3 rounded-xl bg-slate-950 border border-slate-800/80">
-                    <div className="text-slate-400 text-[11px]">แผนจัดตี (3 ไม้)</div>
-                    <div className="text-lg font-extrabold text-white">
-                      {guild?.plans?.length || 0}
+                    <div className="text-slate-400 text-[11px]">ทีมแก้ทางทั้งหมด</div>
+                    <div className="text-lg font-extrabold text-amber-400">
+                      {guild?.combos?.reduce((acc, c) => acc + (c.counterTeams?.length || 0), 0) || 0}
                     </div>
                   </div>
                 </div>
@@ -1712,6 +1892,9 @@ export const GuildPage: React.FC = () => {
           mode={builderModal.mode}
           initialEnemyTeam={builderModal.initialEnemy}
           initialCounterTeam={builderModal.initialCounter}
+          initialHouseNo={builderModal.initialHouseNo}
+          initialIsFortress={builderModal.initialIsFortress}
+          initialCustomName={builderModal.initialCustomName}
           onClose={() => {
             setBuilderModal(null);
             setTargetCounterSlot(null);

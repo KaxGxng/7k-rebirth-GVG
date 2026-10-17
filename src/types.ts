@@ -99,6 +99,9 @@ export interface GuildSchedule {
 
 export interface GuildCombo {
   id: string;
+  houseNo?: number;
+  isFortress?: boolean;
+  customName?: string;
   enemyTeam: EnemyTeam;
   counterTeams: CounterTeam[];
   createdAt?: string;

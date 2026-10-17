@@ -27,6 +27,9 @@ function createSeedData() {
         combos: [
           {
             id: 'combo-tank-meta-1',
+            houseNo: 1,
+            isFortress: true,
+            customName: 'ป้อมหัวกิลด์ (ถึกโรซี่)',
             enemyTeam: {
               strategyId: '1-4',
               teamType: 'tanky',
@@ -147,6 +150,9 @@ function createSeedData() {
           },
           {
             id: 'combo-phys-speed-2',
+            houseNo: 2,
+            isFortress: false,
+            customName: 'บ้านสปีดแฝดลิง',
             enemyTeam: {
               strategyId: '2-3',
               teamType: 'physical',
@@ -220,6 +226,9 @@ function createSeedData() {
           },
           {
             id: 'combo-magic-3',
+            houseNo: 3,
+            isFortress: false,
+            customName: 'บ้านเวทย์หลับยอนฮี',
             enemyTeam: {
               strategyId: '1-4',
               teamType: 'magic',
@@ -646,13 +655,16 @@ async function startServer() {
     if (guild.admin_key !== adminKey) {
       return res.status(401).json({ error: 'เฉพาะแอดมินกิลด์เท่านั้นที่สามารถเพิ่มทีมได้' });
     }
-    const { enemyTeam, counterTeams } = req.body || {};
+    const { enemyTeam, counterTeams, houseNo, isFortress, customName } = req.body || {};
     if (!enemyTeam) {
       return res.status(400).json({ error: 'ข้อมูลทีมเป้าหมายไม่ถูกต้อง' });
     }
     const now = new Date().toISOString();
     const newCombo = {
       id: `combo-${crypto.randomUUID().slice(0, 8)}`,
+      houseNo: houseNo !== undefined && houseNo !== null && houseNo !== '' ? Number(houseNo) : undefined,
+      isFortress: Boolean(isFortress),
+      customName: customName ? String(customName).trim() : '',
       enemyTeam,
       counterTeams: Array.isArray(counterTeams) ? counterTeams : [],
       createdAt: now,
@@ -677,9 +689,12 @@ async function startServer() {
     if (idx === -1) return res.status(404).json({ error: 'ไม่พบทีมเป้าหมายนี้' });
 
     const existing = guild.combos[idx];
-    const { enemyTeam, counterTeams } = req.body || {};
+    const { enemyTeam, counterTeams, houseNo, isFortress, customName } = req.body || {};
     const updated = {
       ...existing,
+      houseNo: houseNo !== undefined ? (houseNo === '' || houseNo === null ? undefined : Number(houseNo)) : existing.houseNo,
+      isFortress: isFortress !== undefined ? Boolean(isFortress) : existing.isFortress,
+      customName: customName !== undefined ? String(customName).trim() : existing.customName,
       enemyTeam: enemyTeam ?? existing.enemyTeam,
       counterTeams: Array.isArray(counterTeams) ? counterTeams : existing.counterTeams,
       updatedAt: new Date().toISOString(),

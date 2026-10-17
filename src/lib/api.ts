@@ -185,7 +185,8 @@ export async function updateViewerLock(
 export async function createComboApi(
   shortId: string,
   enemyTeam: EnemyTeam,
-  counterTeams: CounterTeam[] = []
+  counterTeams: CounterTeam[] = [],
+  extra: { houseNo?: number; isFortress?: boolean; customName?: string } = {}
 ): Promise<GuildCombo> {
   const res = await fetch(`/api/guild/${encodeURIComponent(shortId)}/combos`, {
     method: 'POST',
@@ -193,7 +194,7 @@ export async function createComboApi(
       'Content-Type': 'application/json',
       'X-Admin-Key': getAdminKey(shortId),
     },
-    body: JSON.stringify({ enemyTeam, counterTeams }),
+    body: JSON.stringify({ enemyTeam, counterTeams, ...extra }),
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || 'เพิ่มทีมเป้าหมายไม่สำเร็จ');
@@ -203,7 +204,13 @@ export async function createComboApi(
 export async function updateComboApi(
   shortId: string,
   comboId: string,
-  payload: { enemyTeam?: EnemyTeam; counterTeams?: CounterTeam[] }
+  payload: {
+    enemyTeam?: EnemyTeam;
+    counterTeams?: CounterTeam[];
+    houseNo?: number;
+    isFortress?: boolean;
+    customName?: string;
+  }
 ): Promise<GuildCombo> {
   const res = await fetch(
     `/api/guild/${encodeURIComponent(shortId)}/combos/${encodeURIComponent(comboId)}`,

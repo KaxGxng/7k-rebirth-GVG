@@ -45,8 +45,14 @@ interface TeamBuilderModalProps {
   mode: 'enemy' | 'counter';
   initialEnemyTeam?: EnemyTeam;
   initialCounterTeam?: CounterTeam;
+  initialHouseNo?: number;
+  initialIsFortress?: boolean;
+  initialCustomName?: string;
   onClose: () => void;
-  onSaveEnemy?: (team: EnemyTeam) => Promise<void>;
+  onSaveEnemy?: (
+    team: EnemyTeam,
+    extra?: { houseNo?: number; isFortress?: boolean; customName?: string }
+  ) => Promise<void>;
   onSaveCounter?: (team: CounterTeam) => Promise<void>;
 }
 
@@ -54,6 +60,9 @@ export const TeamBuilderModal: React.FC<TeamBuilderModalProps> = ({
   mode,
   initialEnemyTeam,
   initialCounterTeam,
+  initialHouseNo,
+  initialIsFortress,
+  initialCustomName,
   onClose,
   onSaveEnemy,
   onSaveCounter,
@@ -64,6 +73,9 @@ export const TeamBuilderModal: React.FC<TeamBuilderModalProps> = ({
   const [teamType, setTeamType] = useState<TeamType>(
     (mode === 'enemy' ? initialEnemyTeam?.teamType : undefined) || 'tanky'
   );
+  const [houseNo, setHouseNo] = useState<number | undefined>(initialHouseNo);
+  const [isFortress, setIsFortress] = useState<boolean>(initialIsFortress || false);
+  const [customName, setCustomName] = useState<string>(initialCustomName || '');
 
   // Store character slots in a map by slot index (0..4)
   const [charMap, setCharMap] = useState<Record<number, TeamCharacterSlot>>(() => {
@@ -468,7 +480,11 @@ export const TeamBuilderModal: React.FC<TeamBuilderModalProps> = ({
           },
           pets,
         };
-        await onSaveEnemy(payload);
+        await onSaveEnemy(payload, {
+          houseNo: houseNo ? Number(houseNo) : undefined,
+          isFortress,
+          customName: customName.trim() || undefined,
+        });
       } else if (mode === 'counter' && onSaveCounter) {
         const payload: CounterTeam = {
           id: initialCounterTeam?.id || `counter-${Date.now()}`,
@@ -577,6 +593,63 @@ export const TeamBuilderModal: React.FC<TeamBuilderModalProps> = ({
             <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-rose-500/15 border border-rose-500/40 text-rose-300 text-xs sm:text-sm">
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{errorMsg}</span>
+            </div>
+          )}
+
+          {/* Enemy House / Fortress Config (only in enemy mode) */}
+          {mode === 'enemy' && (
+            <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-3.5 space-y-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <label className="text-xs font-bold text-amber-400 flex items-center gap-1.5">
+                  <Shield className="w-4 h-4" />
+                  <span>ตำแหน่งบ้านกัน / ป้อมปราการ (House / Fortress)</span>
+                </label>
+                <label className="inline-flex items-center gap-2 cursor-pointer text-xs font-semibold text-amber-300 bg-amber-500/10 border border-amber-500/30 px-2.5 py-1 rounded-lg hover:bg-amber-500/20 transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={isFortress}
+                    onChange={(e) => {
+                      setIsFortress(e.target.checked);
+                      if (e.target.checked && (!houseNo || houseNo > 3)) {
+                        setHouseNo(1);
+                      }
+                    }}
+                    className="w-4 h-4 accent-amber-500 rounded"
+                  />
+                  <span>🏰 ป้อมปราการ (Fortress 1 - 3)</span>
+                </label>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[11px] text-slate-400 mb-1">
+                    {isFortress ? 'ป้อมที่ (เลข 1 - 3)' : 'บ้านเลขที่ (เลข 1 - 30)'}
+                  </label>
+                  <input
+                    type="number"
+                    min={1}
+                    max={isFortress ? 3 : 30}
+                    value={houseNo ?? ''}
+                    onChange={(e) =>
+                      setHouseNo(e.target.value ? parseInt(e.target.value, 10) : undefined)
+                    }
+                    placeholder={isFortress ? 'เช่น 1, 2 หรือ 3' : 'เช่น 1 ถึง 30'}
+                    className="w-full rounded-xl bg-slate-900 border border-slate-800 px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] text-slate-400 mb-1">
+                    ชื่อเจ้าของบ้าน / ชื่อบ้าน (ไม่บังคับ)
+                  </label>
+                  <input
+                    type="text"
+                    value={customName}
+                    onChange={(e) => setCustomName(e.target.value)}
+                    placeholder="เช่น บ้านหัวกิลด์, บ้านแฝดถึก, ชื่อผู้เล่น..."
+                    className="w-full rounded-xl bg-slate-900 border border-slate-800 px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
+                  />
+                </div>
+              </div>
             </div>
           )}
 
