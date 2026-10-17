@@ -1,0 +1,579 @@
+{
+  "guilds": {
+    "meta7k": {
+      "short_id": "meta7k",
+      "name": "7K Re:BIRTH Meta GVG (โพยตัวอย่าง)",
+      "admin_key": "1234",
+      "viewer_key": "",
+      "viewer_locked": false,
+      "created_at": "2026-10-17T11:29:50.043Z",
+      "combos": [
+        {
+          "id": "combo-tank-meta-1",
+          "enemyTeam": {
+            "strategyId": "1-4",
+            "teamType": "tanky",
+            "skillOrder": [
+              {
+                "charIndex": 0,
+                "skillType": "B",
+                "order": 1
+              },
+              {
+                "charIndex": 2,
+                "skillType": "T",
+                "order": 2
+              },
+              {
+                "charIndex": 1,
+                "skillType": "B",
+                "order": 3
+              }
+            ],
+            "front": {
+              "characters": [
+                {
+                  "index": 0,
+                  "name": "ลูดี้ awake"
+                }
+              ]
+            },
+            "back": {
+              "characters": [
+                {
+                  "index": 1,
+                  "name": "เกลลิดัส"
+                },
+                {
+                  "index": 2,
+                  "name": "โรซี่"
+                }
+              ]
+            },
+            "pets": [
+              "อีรีน",
+              "วินดี้",
+              "ลู",
+              null,
+              null
+            ]
+          },
+          "counterTeams": [
+            {
+              "id": "counter-tank-1",
+              "order": 0,
+              "strategyId": "1-4",
+              "skillOrder": [
+                {
+                  "charIndex": 1,
+                  "skillType": "B",
+                  "order": 1
+                },
+                {
+                  "charIndex": 2,
+                  "skillType": "T",
+                  "order": 2
+                },
+                {
+                  "charIndex": 1,
+                  "skillType": "T",
+                  "order": 3
+                }
+              ],
+              "front": {
+                "characters": [
+                  {
+                    "index": 0,
+                    "name": "พาลานอส",
+                    "description": "บล็อค 100% >> เลือด >> ป้องกัน (ยืนค้ำรับดาเมจ)",
+                    "equip": {
+                      "sets": [
+                        "นายประตู",
+                        "อัศวินศักดิ์สิทธิ์"
+                      ],
+                      "rings": [
+                        "แหวนแห่งการคีนชีพ",
+                        "แหวนอมตะ",
+                        "แหวนกำแพงเหล็ก"
+                      ]
+                    }
+                  }
+                ]
+              },
+              "back": {
+                "characters": [
+                  {
+                    "index": 1,
+                    "name": "ซองจินอู",
+                    "description": "คริเรท 100% >> คริดาเมจ >> โจมตี (เจาะเกราะทีมถึก)",
+                    "equip": {
+                      "sets": [
+                        "นักฆ่า",
+                        "ผู้ไล่ล่า"
+                      ],
+                      "rings": [
+                        "แหวนแห่งอำนาจ",
+                        "แหวนแห่งการปราบปราม",
+                        "แหวนเวทย์มน"
+                      ]
+                    }
+                  },
+                  {
+                    "index": 2,
+                    "name": "เคลมิส awake",
+                    "description": "เลือด >> บล็อค >> ต้านทานสถานะ (เร่งเทิร์น + ล้างดีบัฟ)",
+                    "equip": {
+                      "sets": [
+                        "อัศวินศักดิ์สิทธิ์",
+                        "ผู้ปรับสมดุล"
+                      ],
+                      "rings": [
+                        "แหวนแห่งสุขภาพ",
+                        "แหวนแห่งการคีนชีพ"
+                      ]
+                    }
+                  }
+                ]
+              },
+              "pets": [
+                "คารัม",
+                "ไพค์",
+                "ครี",
+                null,
+                null
+              ],
+              "note": "เปิดด้วยสกิลล่างคางแหลม (ซองจินอู) เพื่อเจาะโล่ลูดี้ จากนั้นใช้สกิลบนเคลมิสเร่งสกิล แล้วปิดด้วยสกิลบนซองจินอู ระวังโดนป๋าเกลลิดัสแช่แข็งหากไม่มีแหวนต้านทาน"
+            },
+            {
+              "id": "counter-tank-2",
+              "order": 1,
+              "strategyId": "2-3",
+              "skillOrder": [
+                {
+                  "charIndex": 2,
+                  "skillType": "T",
+                  "order": 1
+                },
+                {
+                  "charIndex": 3,
+                  "skillType": "B",
+                  "order": 2
+                },
+                {
+                  "charIndex": 0,
+                  "skillType": "B",
+                  "order": 3
+                }
+              ],
+              "front": {
+                "characters": [
+                  {
+                    "index": 0,
+                    "name": "ซุนหงอคง",
+                    "description": "โจมตี >> คริ >> เลือด (ร่างแยกปั่นป่วนแนวหลัง)",
+                    "equip": {
+                      "sets": [
+                        "ผู้บัญชาการ",
+                        "นักฆ่า"
+                      ],
+                      "rings": [
+                        "แหวนแห่งการคีนชีพ",
+                        "แหวนแห่งพลังกายใจ"
+                      ]
+                    }
+                  }
+                ]
+              },
+              "back": {
+                "characters": [
+                  {
+                    "index": 2,
+                    "name": "ยอนฮี",
+                    "description": "โจมตีเวทย์ >> จุดอ่อน >> แม่นยำ (หลับยกทีม + ทะลวงเกราะ)",
+                    "equip": {
+                      "sets": [
+                        "ผู้ไล่ล่า",
+                        "หมอผี"
+                      ],
+                      "rings": [
+                        "แหวนแห่งความฝัน",
+                        "แหวนเวทย์มน",
+                        "แหวนแห่งอำนาจ"
+                      ]
+                    }
+                  },
+                  {
+                    "index": 3,
+                    "name": "เมลคีร์",
+                    "description": "เลือด >> เข้าเป้า >> โจมตีเวทย์",
+                    "equip": {
+                      "sets": [
+                        "หมอผี",
+                        "อัศวินศักดิ์สิทธิ์"
+                      ],
+                      "rings": [
+                        "แหวนอมตะ",
+                        "แหวนกาลเวลา"
+                      ]
+                    }
+                  }
+                ]
+              },
+              "pets": [
+                "ยอนจี",
+                "ยู",
+                null,
+                null,
+                null
+              ],
+              "note": "ใช้ยอนฮีสกิลบนกล่อมหลับแล้วตามด้วยเมลคีร์ลดเทิร์นบัฟอมตะของโรซี่ หงอคงคอยเก็บตกตัวที่หลุดออกมา"
+            }
+          ],
+          "createdAt": "2026-10-17T11:29:50.043Z",
+          "updatedAt": "2026-10-17T11:29:50.043Z"
+        },
+        {
+          "id": "combo-phys-speed-2",
+          "enemyTeam": {
+            "strategyId": "2-3",
+            "teamType": "physical",
+            "skillOrder": [
+              {
+                "charIndex": 0,
+                "skillType": "T",
+                "order": 1
+              },
+              {
+                "charIndex": 2,
+                "skillType": "B",
+                "order": 2
+              },
+              {
+                "charIndex": 3,
+                "skillType": "T",
+                "order": 3
+              }
+            ],
+            "front": {
+              "characters": [
+                {
+                  "index": 0,
+                  "name": "พาลานอส"
+                },
+                {
+                  "index": 1,
+                  "name": "ซุนหงอคง"
+                }
+              ]
+            },
+            "back": {
+              "characters": [
+                {
+                  "index": 2,
+                  "name": "บรันซ์ & บรันเซล"
+                }
+              ]
+            },
+            "pets": [
+              "ไพค์",
+              "คารัม",
+              null,
+              null,
+              null
+            ]
+          },
+          "counterTeams": [
+            {
+              "id": "counter-phys-1",
+              "order": 0,
+              "strategyId": "1-4",
+              "skillOrder": [
+                {
+                  "charIndex": 0,
+                  "skillType": "T",
+                  "order": 1
+                },
+                {
+                  "charIndex": 1,
+                  "skillType": "B",
+                  "order": 2
+                },
+                {
+                  "charIndex": 2,
+                  "skillType": "T",
+                  "order": 3
+                }
+              ],
+              "front": {
+                "characters": [
+                  {
+                    "index": 0,
+                    "name": "แร็ดกริด",
+                    "description": "บล็อค >> ป้องกัน >> เลือด (ยานแม่กางเกราะสะท้อนดาเมจ)",
+                    "equip": {
+                      "sets": [
+                        "นายประตู",
+                        "ผู้พิทักษ์"
+                      ],
+                      "rings": [
+                        "แหวนกำแพงเหล็ก",
+                        "แหวนแห่งการคีนชีพ",
+                        "แหวนแห่งโอกาส"
+                      ]
+                    }
+                  }
+                ]
+              },
+              "back": {
+                "characters": [
+                  {
+                    "index": 1,
+                    "name": "เกลลิดัส",
+                    "description": "เลือด >> บล็อค >> โจมตี (ป๋าเกลเคาน์เตอร์แช่แข็งแฝด & ลิง)",
+                    "equip": {
+                      "sets": [
+                        "อัศวินศักดิ์สิทธิ์",
+                        "นายประตู"
+                      ],
+                      "rings": [
+                        "แหวนแห่งทุ่งหิมะ",
+                        "แหวนอมตะ",
+                        "แหวนแห่งสุขภาพ"
+                      ]
+                    }
+                  },
+                  {
+                    "index": 2,
+                    "name": "จูริ",
+                    "description": "โจมตี >> จุดอ่อน >> คริ (ตัดฮีล + สวนกลับ)",
+                    "equip": {
+                      "sets": [
+                        "ผู้ไล่ล่า",
+                        "นักฆ่า"
+                      ],
+                      "rings": [
+                        "แหวนแห่งอำนาจ",
+                        "แหวนเวทย์มน"
+                      ]
+                    }
+                  }
+                ]
+              },
+              "pets": [
+                "อีรีน",
+                "ลู",
+                "ดอจ",
+                null,
+                null
+              ],
+              "note": "เอาแร็ดกริด (ยานแม่) ยืนหน้ารับสปีดของแฝดกับลิง พอแฝดพุ่งเข้ามาจะติดแช่แข็งจากพาสซีฟป๋าเกลลิดัสทันที จากนั้นกดสกิลล่างเกลลิดัสและจูริเก็บกวาด"
+            }
+          ],
+          "createdAt": "2026-10-17T11:29:50.043Z",
+          "updatedAt": "2026-10-17T11:29:50.043Z"
+        },
+        {
+          "id": "combo-magic-3",
+          "enemyTeam": {
+            "strategyId": "1-4",
+            "teamType": "magic",
+            "skillOrder": [
+              {
+                "charIndex": 1,
+                "skillType": "T",
+                "order": 1
+              },
+              {
+                "charIndex": 2,
+                "skillType": "B",
+                "order": 2
+              },
+              {
+                "charIndex": 0,
+                "skillType": "B",
+                "order": 3
+              }
+            ],
+            "front": {
+              "characters": [
+                {
+                  "index": 0,
+                  "name": "วาเนสซา"
+                }
+              ]
+            },
+            "back": {
+              "characters": [
+                {
+                  "index": 1,
+                  "name": "ยอนฮี"
+                },
+                {
+                  "index": 2,
+                  "name": "เมลคีร์"
+                }
+              ]
+            },
+            "pets": [
+              "ยอนจี",
+              "เดลโล่",
+              null,
+              null,
+              null
+            ]
+          },
+          "counterTeams": [
+            {
+              "id": "counter-magic-1",
+              "order": 0,
+              "strategyId": "4-1",
+              "skillOrder": [
+                {
+                  "charIndex": 4,
+                  "skillType": "B",
+                  "order": 1
+                },
+                {
+                  "charIndex": 4,
+                  "skillType": "T",
+                  "order": 2
+                },
+                {
+                  "charIndex": 1,
+                  "skillType": "T",
+                  "order": 3
+                }
+              ],
+              "front": {
+                "characters": [
+                  {
+                    "index": 1,
+                    "name": "บรันซ์ & บรันเซล",
+                    "description": "สปีด >> โจมตี >> คริ",
+                    "equip": {
+                      "sets": [
+                        "ผู้บัญชาการ"
+                      ],
+                      "rings": [
+                        "แหวนอมตะ",
+                        "แหวนเวทย์มน"
+                      ]
+                    }
+                  },
+                  {
+                    "index": 2,
+                    "name": "ออร์ก้า awake",
+                    "description": "สปีด >> เข้าเป้า >> โจมตี",
+                    "equip": {
+                      "sets": [
+                        "หมอผี"
+                      ],
+                      "rings": [
+                        "แหวนกาลเวลา",
+                        "แหวนแห่งการคีนชีพ"
+                      ]
+                    }
+                  }
+                ]
+              },
+              "back": {
+                "characters": [
+                  {
+                    "index": 4,
+                    "name": "ไคล์",
+                    "description": "โจมตี >> คริ 100% >> จุดอ่อน (โซ่กวาดแถวหลังยอนฮี)",
+                    "equip": {
+                      "sets": [
+                        "นักฆ่า",
+                        "ผู้ไล่ล่า"
+                      ],
+                      "rings": [
+                        "แหวนแห่งอำนาจ",
+                        "แหวนอมตะ",
+                        "แหวนช่วงชิงปราสาท"
+                      ]
+                    }
+                  }
+                ]
+              },
+              "pets": [
+                "เดลโล่",
+                "คารัม",
+                null,
+                null,
+                null
+              ],
+              "note": "อัดสปีดชิงเปิดก่อนด้วยสกิลล่างไคล์ + สกิลบนไคล์ เพื่อล้วงยอนฮีและเมลคีร์ด้านหลังให้ตายก่อนได้ออกสกิล"
+            }
+          ],
+          "createdAt": "2026-10-17T11:29:50.043Z",
+          "updatedAt": "2026-10-17T11:29:50.043Z"
+        }
+      ]
+    },
+    "smnun8": {
+      "short_id": "smnun8",
+      "name": "SuNSeT",
+      "admin_key": "1234",
+      "viewer_key": "",
+      "viewer_locked": false,
+      "created_at": "2026-10-17T11:46:29.933Z",
+      "combos": [
+        {
+          "id": "combo-4b52f8e3",
+          "enemyTeam": {
+            "strategyId": "4-1",
+            "teamType": "magic",
+            "skillOrder": [
+              {
+                "charIndex": 1,
+                "skillType": "T",
+                "order": 1
+              },
+              {
+                "charIndex": 4,
+                "skillType": "T",
+                "order": 2
+              },
+              {
+                "charIndex": 4,
+                "skillType": "B",
+                "order": 3
+              }
+            ],
+            "front": {
+              "characters": [
+                {
+                  "index": 0,
+                  "name": "โดยอง awake"
+                },
+                {
+                  "index": 1,
+                  "name": "สกัลด์ awake"
+                }
+              ]
+            },
+            "back": {
+              "characters": [
+                {
+                  "index": 4,
+                  "name": "ยุนกอน awake"
+                }
+              ]
+            },
+            "pets": [
+              "ยอนจี",
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "counterTeams": [],
+          "createdAt": "2026-10-17T12:26:59.403Z",
+          "updatedAt": "2026-10-17T12:27:24.084Z"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,2310 @@
+{
+  "characters": [
+    {
+      "id": "101256",
+      "name": "จูริ",
+      "baseName": "จูริ",
+      "tier": "O7K",
+      "tierLabel": "O7K",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_101256.webp",
+      "aliases": [
+        "Juri",
+        "นิยามแห่งความเป็นเลิศ",
+        "juri"
+      ]
+    },
+    {
+      "id": "101226",
+      "name": "โรซี่",
+      "baseName": "โรซี่",
+      "tier": "O7K",
+      "tierLabel": "O7K",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_101226.webp",
+      "aliases": [
+        "Rosie",
+        "อัศวินศักดิ์สิทธิ์ผู้ปลีกวิเวก",
+        "พระแม่",
+        "rosie"
+      ]
+    },
+    {
+      "id": "101216",
+      "name": "ไพร์",
+      "baseName": "ไพร์",
+      "tier": "O7K",
+      "tierLabel": "O7K",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_101216.webp",
+      "aliases": [
+        "Fai",
+        "เปลวเพลิงแห่งทะเลทราย",
+        "ไฟร์",
+        "fai"
+      ]
+    },
+    {
+      "id": "101206",
+      "name": "มิเลีย",
+      "baseName": "มิเลีย",
+      "tier": "O7K",
+      "tierLabel": "O7K",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_101206.webp",
+      "aliases": [
+        "Melia",
+        "มังกรคริสตัลแห่งโชคชะตา",
+        "มังกรน้ำ",
+        "milia"
+      ]
+    },
+    {
+      "id": "101196",
+      "name": "เกลลิดัส",
+      "baseName": "เกลลิดัส",
+      "tier": "O7K",
+      "tierLabel": "O7K",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_101196.webp",
+      "aliases": [
+        "Gelidus",
+        "ผู้แกร่งกล้าแห่งความหนาวเหน็บ",
+        "ป๋า",
+        "เกล",
+        "gelidus"
+      ]
+    },
+    {
+      "id": "402017",
+      "name": "กิยู awake",
+      "baseName": "กิยู",
+      "tier": "awake",
+      "tierLabel": "Awake",
+      "awakened": true,
+      "imageUrl": "/assets/catalog/negilab_402017.webp",
+      "aliases": [
+        "โทมิโอกะ กิยู",
+        "กิยู",
+        "Giyu Tomioka",
+        "เสาหลักวารี",
+        "giyu",
+        "ดาบพิฆาตอสูร"
+      ]
+    },
+    {
+      "id": "402007",
+      "name": "ชิโนบุ awake",
+      "baseName": "ชิโนบุ",
+      "tier": "awake",
+      "tierLabel": "Awake",
+      "awakened": true,
+      "imageUrl": "/assets/catalog/negilab_402007.webp",
+      "aliases": [
+        "โคโจ ชิโนบุ",
+        "ชิโนบุ",
+        "Shinobu Kocho",
+        "เสาหลักแมลง",
+        "shinobu",
+        "ดาบพิฆาตอสูร"
+      ]
+    },
+    {
+      "id": "401997",
+      "name": "เซนอิซึ awake",
+      "baseName": "เซนอิซึ",
+      "tier": "awake",
+      "tierLabel": "Awake",
+      "awakened": true,
+      "imageUrl": "/assets/catalog/negilab_401997.webp",
+      "aliases": [
+        "อางาซึมะ เซนอิทซึ",
+        "เซนอิซึ",
+        "Zenitsu Agatsuma",
+        "ปราณอัสนี",
+        "เซ็นอิทสึ",
+        "zenitsu",
+        "ดาบพิฆาตอสูร"
+      ]
+    },
+    {
+      "id": "401987",
+      "name": "ทันจิโร่ awake",
+      "baseName": "ทันจิโร่",
+      "tier": "awake",
+      "tierLabel": "Awake",
+      "awakened": true,
+      "imageUrl": "/assets/catalog/negilab_401987.webp",
+      "aliases": [
+        "คามาโดะ ทันจิโร่",
+        "ทันจิโร่",
+        "Tanjiro Kamado",
+        "ฮิโนะคามิคางุระ",
+        "tanjiro",
+        "ดาบพิฆาตอสูร"
+      ]
+    },
+    {
+      "id": "401907",
+      "name": "ยุนกอน awake",
+      "baseName": "ยุนกอน",
+      "tier": "awake",
+      "tierLabel": "Awake",
+      "awakened": true,
+      "imageUrl": "/assets/catalog/negilab_401907.webp",
+      "aliases": [
+        "ยุนกอน",
+        "Yoongun",
+        "ตัวแทนเจตจำนงแห่งสวรรค์"
+      ]
+    },
+    {
+      "id": "401897",
+      "name": "โดยอง awake",
+      "baseName": "โดยอง",
+      "tier": "awake",
+      "tierLabel": "Awake",
+      "awakened": true,
+      "imageUrl": "/assets/catalog/negilab_401897.webp",
+      "aliases": [
+        "โดยอง",
+        "Dongyoung",
+        "ผู้นำทางสู่ปรโลก"
+      ]
+    },
+    {
+      "id": "401887",
+      "name": "ฮายอน awake",
+      "baseName": "ฮายอน",
+      "tier": "awake",
+      "tierLabel": "Awake",
+      "awakened": true,
+      "imageUrl": "/assets/catalog/negilab_401887.webp",
+      "aliases": [
+        "ฮายอน",
+        "Hayeon",
+        "สตรีเทพคนสุดท้าย",
+        "ฮายอง",
+        "ตะเกียง",
+        "hayeon",
+        "hayoung"
+      ]
+    },
+    {
+      "id": "401877",
+      "name": "ซอรัน awake",
+      "baseName": "ซอรัน",
+      "tier": "awake",
+      "tierLabel": "Awake",
+      "awakened": true,
+      "imageUrl": "/assets/catalog/negilab_401877.webp",
+      "aliases": [
+        "ซอรัน",
+        "Sunran",
+        "ดาบสรวงสวรรค์"
+      ]
+    },
+    {
+      "id": "401827",
+      "name": "อาริส awake",
+      "baseName": "อาริส",
+      "tier": "awake",
+      "tierLabel": "Awake",
+      "awakened": true,
+      "imageUrl": "/assets/catalog/negilab_401827.webp",
+      "aliases": [
+        "อาริส",
+        "Aris",
+        "หมอกควันอันโดดเดี่ยว"
+      ]
+    },
+    {
+      "id": "401807",
+      "name": "ออร์ก้า awake",
+      "baseName": "ออร์ก้า",
+      "tier": "awake",
+      "tierLabel": "Awake",
+      "awakened": true,
+      "imageUrl": "/assets/catalog/negilab_401807.webp",
+      "aliases": [
+        "ออร์ก้า",
+        "Orkah",
+        "ตุลาการอำมหิต"
+      ]
+    },
+    {
+      "id": "401797",
+      "name": "เคลมิส awake",
+      "baseName": "เคลมิส",
+      "tier": "awake",
+      "tierLabel": "Awake",
+      "awakened": true,
+      "imageUrl": "/assets/catalog/negilab_401797.webp",
+      "aliases": [
+        "เคลมิส",
+        "Clemyth",
+        "ย่างก้าวแห่งการไถ่บาป"
+      ]
+    },
+    {
+      "id": "401687",
+      "name": "สกัลด์ awake",
+      "baseName": "สกัลด์",
+      "tier": "awake",
+      "tierLabel": "Awake",
+      "awakened": true,
+      "imageUrl": "/assets/catalog/negilab_401687.webp",
+      "aliases": [
+        "สกัลด์",
+        "Skuld",
+        "คำพยากรณ์ลำดับที่ 3"
+      ]
+    },
+    {
+      "id": "400817",
+      "name": "เบลลีก้า awake",
+      "baseName": "เบลลีก้า",
+      "tier": "awake",
+      "tierLabel": "Awake",
+      "awakened": true,
+      "imageUrl": "/assets/catalog/negilab_400817.webp",
+      "aliases": [
+        "เบลลีก้า",
+        "Velika",
+        "แม่มดจันทร์ทมิฬ"
+      ]
+    },
+    {
+      "id": "400597",
+      "name": "ไอลีน awake",
+      "baseName": "ไอลีน",
+      "tier": "awake",
+      "tierLabel": "Awake",
+      "awakened": true,
+      "imageUrl": "/assets/catalog/negilab_400597.webp",
+      "aliases": [
+        "ไอลีน",
+        "Eileene",
+        "จักรพรรดินีแห่งความอมตะ",
+        "เจ๊",
+        "ไอลีนปลุก",
+        "eileene"
+      ]
+    },
+    {
+      "id": "400587",
+      "name": "เดลโลนส์ awake",
+      "baseName": "เดลโลนส์",
+      "tier": "awake",
+      "tierLabel": "Awake",
+      "awakened": true,
+      "imageUrl": "/assets/catalog/negilab_400587.webp",
+      "aliases": [
+        "เดลโลนส์",
+        "Dellons",
+        "อัศวินแห่งการทำลายล้าง",
+        "เคียว",
+        "เดล",
+        "เดลปลุก",
+        "dellons"
+      ]
+    },
+    {
+      "id": "400567",
+      "name": "ลูดี้ awake",
+      "baseName": "ลูดี้",
+      "tier": "awake",
+      "tierLabel": "Awake",
+      "awakened": true,
+      "imageUrl": "/assets/catalog/negilab_400567.webp",
+      "aliases": [
+        "ลูดี้",
+        "Rudy",
+        "ผู้นำทาง",
+        "โล่ทอง",
+        "ลูดี้ปลุก",
+        "rudy"
+      ]
+    },
+    {
+      "id": "400557",
+      "name": "ซิลเวสตา awake",
+      "baseName": "ซิลเวสตา",
+      "tier": "awake",
+      "tierLabel": "Awake",
+      "awakened": true,
+      "imageUrl": "/assets/catalog/negilab_400557.webp",
+      "aliases": [
+        "ซิลเวสตา",
+        "Silvesta",
+        "ตุลาการทมิฬ"
+      ]
+    },
+    {
+      "id": "400497",
+      "name": "น็อกซ์ awake",
+      "baseName": "น็อกซ์",
+      "tier": "awake",
+      "tierLabel": "Awake",
+      "awakened": true,
+      "imageUrl": "/assets/catalog/negilab_400497.webp",
+      "aliases": [
+        "น็อกซ์",
+        "Knox",
+        "อวตารแห่งนรก"
+      ]
+    },
+    {
+      "id": "101786",
+      "name": "คาร์ล เฮรอน",
+      "baseName": "คาร์ล เฮรอน",
+      "tier": "ทองบน",
+      "tierLabel": "ทองบน",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_101786.webp",
+      "aliases": [
+        "Karl Heron",
+        "นักล่าหอกคู่"
+      ]
+    },
+    {
+      "id": "101776",
+      "name": "โอม๊ก",
+      "baseName": "โอม๊ก",
+      "tier": "ทองบน",
+      "tierLabel": "ทองบน",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_101776.webp",
+      "aliases": [
+        "O'Mok",
+        "สายเลือดนักเวทแห่งวิญญาณ"
+      ]
+    },
+    {
+      "id": "101736",
+      "name": "ซองจินอู",
+      "baseName": "ซองจินอู",
+      "tier": "ทองบน",
+      "tierLabel": "ทองบน",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_101736.webp",
+      "aliases": [
+        "Sung Jinwoo",
+        "จักรพรรดิเงา",
+        "คางแหลม",
+        "จินอู",
+        "sungjinwoo"
+      ]
+    },
+    {
+      "id": "101726",
+      "name": "มิสต์",
+      "baseName": "มิสต์",
+      "tier": "ทองบน",
+      "tierLabel": "ทองบน",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_101726.webp",
+      "aliases": [
+        "Mist",
+        "ผู้คุมอำนาจขั้นสุดท้าย"
+      ]
+    },
+    {
+      "id": "101716",
+      "name": "แรนด์กริด",
+      "baseName": "แรนด์กริด",
+      "tier": "ทองบน",
+      "tierLabel": "ทองบน",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_101716.webp",
+      "aliases": [
+        "Randgrid",
+        "ความภูมิใจครั้งสุดท้าย",
+        "แรนกริด",
+        "randgrid"
+      ]
+    },
+    {
+      "id": "101706",
+      "name": "เรกินเลฟ",
+      "baseName": "เรกินเลฟ",
+      "tier": "ทองบน",
+      "tierLabel": "ทองบน",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_101706.webp",
+      "aliases": [
+        "Reginleif",
+        "ผู้ให้คำมั่นสัญญา"
+      ]
+    },
+    {
+      "id": "101696",
+      "name": "แร็ดกริด",
+      "baseName": "แร็ดกริด",
+      "tier": "ทองบน",
+      "tierLabel": "ทองบน",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_101696.webp",
+      "aliases": [
+        "Radgrid",
+        "ผู้ทำนายผลประโยชน์",
+        "ยานแม่",
+        "เรดกริด",
+        "radgrid"
+      ]
+    },
+    {
+      "id": "101566",
+      "name": "นาจา",
+      "baseName": "นาจา",
+      "tier": "ทองบน",
+      "tierLabel": "ทองบน",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_101566.webp",
+      "aliases": [
+        "Nezha",
+        "สามเศียรหกกร"
+      ]
+    },
+    {
+      "id": "101486",
+      "name": "ลิโป้",
+      "baseName": "ลิโป้",
+      "tier": "ทองบน",
+      "tierLabel": "ทองบน",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_101486.webp",
+      "aliases": [
+        "Lu Bu",
+        "ยอดขุนพลไร้เทียมทาน",
+        "ม้าเซ็กเธาว์",
+        "lu bu"
+      ]
+    },
+    {
+      "id": "101476",
+      "name": "ซุนหงอคง",
+      "baseName": "ซุนหงอคง",
+      "tier": "ทองบน",
+      "tierLabel": "ทองบน",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_101476.webp",
+      "aliases": [
+        "Sun Wukong",
+        "อรหันต์แห่งชัยชนะ",
+        "ลิง",
+        "หงอคง",
+        "เจี๊ยก",
+        "wukong"
+      ]
+    },
+    {
+      "id": "101466",
+      "name": "พาลานอส",
+      "baseName": "พาลานอส",
+      "tier": "ทองบน",
+      "tierLabel": "ทองบน",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_101466.webp",
+      "aliases": [
+        "Pallanus",
+        "เกียรติยศที่พังทลาย",
+        "พารานอส",
+        "pallanus"
+      ]
+    },
+    {
+      "id": "101456",
+      "name": "บรันซ์ & บรันเซล",
+      "baseName": "บรันซ์ & บรันเซล",
+      "tier": "ทองบน",
+      "tierLabel": "ทองบน",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_101456.webp",
+      "aliases": [
+        "Branze & Bransel",
+        "ผู้พิทักษ์แห่งวิหาร",
+        "แฝด",
+        "หมาแฝด",
+        "แฝดมืด",
+        "branze",
+        "bransel"
+      ]
+    },
+    {
+      "id": "101446",
+      "name": "อากีลา",
+      "baseName": "อากีลา",
+      "tier": "ทองบน",
+      "tierLabel": "ทองบน",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_101446.webp",
+      "aliases": [
+        "Aquila",
+        "ผู้ปฏิบัติการคนสุดท้าย"
+      ]
+    },
+    {
+      "id": "101436",
+      "name": "ไคล์",
+      "baseName": "ไคล์",
+      "tier": "ทองบน",
+      "tierLabel": "ทองบน",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_101436.webp",
+      "aliases": [
+        "Kyle",
+        "ผู้ติดตามยามค่ำคืน",
+        "โซ่",
+        "kyle"
+      ]
+    },
+    {
+      "id": "101426",
+      "name": "คาร์ม่า",
+      "baseName": "คาร์ม่า",
+      "tier": "ทองบน",
+      "tierLabel": "ทองบน",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_101426.webp",
+      "aliases": [
+        "Karma",
+        "ผู้บำเพ็ญตนแห่งความสิ้นหวัง",
+        "กงล้อ",
+        "karma"
+      ]
+    },
+    {
+      "id": "101416",
+      "name": "ริน",
+      "baseName": "ริน",
+      "tier": "ทองบน",
+      "tierLabel": "ทองบน",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_101416.webp",
+      "aliases": [
+        "Rin",
+        "ราชินีมังกร",
+        "จักรพรรดินี",
+        "rin"
+      ]
+    },
+    {
+      "id": "101386",
+      "name": "คางุระ",
+      "baseName": "คางุระ",
+      "tier": "ทองบน",
+      "tierLabel": "ทองบน",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_101386.webp",
+      "aliases": [
+        "Kagura",
+        "ผู้พิทักษ์แห่งดาบโอโรจิ"
+      ]
+    },
+    {
+      "id": "101376",
+      "name": "พยัคฆ์เมฆา",
+      "baseName": "พยัคฆ์เมฆา",
+      "tier": "ทองบน",
+      "tierLabel": "ทองบน",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_101376.webp",
+      "aliases": [
+        "Klahan",
+        "ปรมาจารย์มวยไทย",
+        "กล้าหาญ",
+        "เสือ",
+        "พยัคฆ์",
+        "klahan"
+      ]
+    },
+    {
+      "id": "101316",
+      "name": "เฟรยา",
+      "baseName": "เฟรยา",
+      "tier": "ทองบน",
+      "tierLabel": "ทองบน",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_101316.webp",
+      "aliases": [
+        "Freyja",
+        "ผู้เข้าร่วมสงครามแห่งสันติภาพ",
+        "เฟรย่า",
+        "freyja"
+      ]
+    },
+    {
+      "id": "101306",
+      "name": "ธรูด",
+      "baseName": "ธรูด",
+      "tier": "ทองบน",
+      "tierLabel": "ทองบน",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_101306.webp",
+      "aliases": [
+        "Trude",
+        "นักล่าผู้แข็งแกร่ง"
+      ]
+    },
+    {
+      "id": "101296",
+      "name": "ไรอัน",
+      "baseName": "ไรอัน",
+      "tier": "ทองบน",
+      "tierLabel": "ทองบน",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_101296.webp",
+      "aliases": [
+        "Ryan",
+        "ดาบปีศาจแห่งคุณธรรม"
+      ]
+    },
+    {
+      "id": "101286",
+      "name": "คิริเอล",
+      "baseName": "คิริเอล",
+      "tier": "ทองบน",
+      "tierLabel": "ทองบน",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_101286.webp",
+      "aliases": [
+        "Kyrielle",
+        "สมาชิกคณะปฏิวัติ"
+      ]
+    },
+    {
+      "id": "101276",
+      "name": "เอลิเซีย",
+      "baseName": "เอลิเซีย",
+      "tier": "ทองบน",
+      "tierLabel": "ทองบน",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_101276.webp",
+      "aliases": [
+        "Elysia",
+        "หัวหน้ากลุ่มปฏิวัติ"
+      ]
+    },
+    {
+      "id": "101266",
+      "name": "ออร์ลี่",
+      "baseName": "ออร์ลี่",
+      "tier": "ทองบน",
+      "tierLabel": "ทองบน",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_101266.webp",
+      "aliases": [
+        "Orly",
+        "ร่างจำแลงแห่งศาสตร์ขาว"
+      ]
+    },
+    {
+      "id": "101136",
+      "name": "โคลท์",
+      "baseName": "โคลท์",
+      "tier": "ทองบน",
+      "tierLabel": "ทองบน",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_101136.webp",
+      "aliases": [
+        "Colt",
+        "ผู้จัดการทางทหาร"
+      ]
+    },
+    {
+      "id": "101126",
+      "name": "เมลคีร์",
+      "baseName": "เมลคีร์",
+      "tier": "ทองบน",
+      "tierLabel": "ทองบน",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_101126.webp",
+      "aliases": [
+        "Mercure",
+        "นักรบทมิฬแห่งความโกลาหล",
+        "melkir"
+      ]
+    },
+    {
+      "id": "101106",
+      "name": "บิสกิต",
+      "baseName": "บิสกิต",
+      "tier": "ทองบน",
+      "tierLabel": "ทองบน",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_101106.webp",
+      "aliases": [
+        "Biscuit",
+        "ช่างตีเหล็กประกายไฟ"
+      ]
+    },
+    {
+      "id": "100636",
+      "name": "วาเนสซา",
+      "baseName": "วาเนสซา",
+      "tier": "ทองบน",
+      "tierLabel": "ทองบน",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_100636.webp",
+      "aliases": [
+        "Vanessa",
+        "สักขีพยานแห่งกาลเวลา",
+        "นาฬิกาทราย",
+        "vanessa"
+      ]
+    },
+    {
+      "id": "100626",
+      "name": "สไปค์",
+      "baseName": "สไปค์",
+      "tier": "ทองบน",
+      "tierLabel": "ทองบน",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_100626.webp",
+      "aliases": [
+        "Spike",
+        "ทรราชแห่งความหนาวเหน็บ",
+        "น้ำแข็ง",
+        "spike"
+      ]
+    },
+    {
+      "id": "100616",
+      "name": "เจฟ",
+      "baseName": "เจฟ",
+      "tier": "ทองบน",
+      "tierLabel": "ทองบน",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_100616.webp",
+      "aliases": [
+        "Jave",
+        "เทพผู้พิทักษ์",
+        "ขี่มังกร",
+        "jave"
+      ]
+    },
+    {
+      "id": "100606",
+      "name": "ราเชล",
+      "baseName": "ราเชล",
+      "tier": "ทองบน",
+      "tierLabel": "ทองบน",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_100606.webp",
+      "aliases": [
+        "Rachel",
+        "อวตารแห่งความอมตะ",
+        "ฟีนิกซ์",
+        "rachel"
+      ]
+    },
+    {
+      "id": "100576",
+      "name": "คริส",
+      "baseName": "คริส",
+      "tier": "ทองบน",
+      "tierLabel": "ทองบน",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_100576.webp",
+      "aliases": [
+        "Kris",
+        "ขุนพลแห่งนรก",
+        "ยมทูต",
+        "kris"
+      ]
+    },
+    {
+      "id": "100546",
+      "name": "เพลตัน",
+      "baseName": "เพลตัน",
+      "tier": "ทองบน",
+      "tierLabel": "ทองบน",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_100546.webp",
+      "aliases": [
+        "Platin",
+        "หัวหน้าบาทหลวง"
+      ]
+    },
+    {
+      "id": "100536",
+      "name": "ยอนฮี",
+      "baseName": "ยอนฮี",
+      "tier": "ทองบน",
+      "tierLabel": "ทองบน",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_100536.webp",
+      "aliases": [
+        "Yeonhee",
+        "ผู้นำทางสู่จุดจบ",
+        "ง่วง",
+        "yeonhee"
+      ]
+    },
+    {
+      "id": "100526",
+      "name": "แทโอ",
+      "baseName": "แทโอ",
+      "tier": "ทองบน",
+      "tierLabel": "ทองบน",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_100526.webp",
+      "aliases": [
+        "Teo",
+        "ไนท์โครว",
+        "อีกา",
+        "teo"
+      ]
+    },
+    {
+      "id": "100516",
+      "name": "เอซ",
+      "baseName": "เอซ",
+      "tier": "ทองบน",
+      "tierLabel": "ทองบน",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_100516.webp",
+      "aliases": [
+        "Ace",
+        "เจ้าของดาบเมฆา",
+        "ซามูไร",
+        "ace"
+      ]
+    },
+    {
+      "id": "101866",
+      "name": "แทอู๊ด",
+      "baseName": "แทอู๊ด",
+      "tier": "ทองล่าง",
+      "tierLabel": "ทองล่าง",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_101866.webp",
+      "aliases": [
+        "Deo",
+        "แม่ทัพผู้ล่าความอร่อย",
+        "deo"
+      ]
+    },
+    {
+      "id": "101746",
+      "name": "ชาแฮอิน",
+      "baseName": "ชาแฮอิน",
+      "tier": "ทองล่าง",
+      "tierLabel": "ทองล่าง",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_101746.webp",
+      "aliases": [
+        "Cha Hae-in",
+        "นางระบำ"
+      ]
+    },
+    {
+      "id": "101616",
+      "name": "กวนอู",
+      "baseName": "กวนอู",
+      "tier": "ทองล่าง",
+      "tierLabel": "ทองล่าง",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_101616.webp",
+      "aliases": [
+        "Guan Yu",
+        "เจ้าแห่งยุทธสันติ"
+      ]
+    },
+    {
+      "id": "101606",
+      "name": "เตียวเสี้ยน",
+      "baseName": "เตียวเสี้ยน",
+      "tier": "ทองล่าง",
+      "tierLabel": "ทองล่าง",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_101606.webp",
+      "aliases": [
+        "Diaochan",
+        "ยอดหญิงงาม"
+      ]
+    },
+    {
+      "id": "101556",
+      "name": "ไป๋เจียว",
+      "baseName": "ไป๋เจียว",
+      "tier": "ทองล่าง",
+      "tierLabel": "ทองล่าง",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_101556.webp",
+      "aliases": [
+        "Bai Jiao",
+        "ขุนนางชั้นสูง",
+        "ไป่เจียว",
+        "bai jiao"
+      ]
+    },
+    {
+      "id": "101546",
+      "name": "ไป่หลง",
+      "baseName": "ไป่หลง",
+      "tier": "ทองล่าง",
+      "tierLabel": "ทองล่าง",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_101546.webp",
+      "aliases": [
+        "Bai Long",
+        "หมัดราชันสายฟ้าฟาด"
+      ]
+    },
+    {
+      "id": "101526",
+      "name": "เสี่ยวเฉียว",
+      "baseName": "เสี่ยวเฉียว",
+      "tier": "ทองล่าง",
+      "tierLabel": "ทองล่าง",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_101526.webp",
+      "aliases": [
+        "Xiao Qiao",
+        "สาวงามที่กลับมา",
+        "เสี่ยวเฉี่ยว",
+        "ตุ้ม",
+        "เสี่ยวเกียว",
+        "xiao qiao"
+      ]
+    },
+    {
+      "id": "101406",
+      "name": "เอมิเลีย",
+      "baseName": "เอมิเลีย",
+      "tier": "ทองล่าง",
+      "tierLabel": "ทองล่าง",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_101406.webp",
+      "aliases": [
+        "Amelia",
+        "ฮีโร่หญิง"
+      ]
+    },
+    {
+      "id": "101396",
+      "name": "มิโฮะ",
+      "baseName": "มิโฮะ",
+      "tier": "ทองล่าง",
+      "tierLabel": "ทองล่าง",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_101396.webp",
+      "aliases": [
+        "Miho",
+        "สาวน้อยผู้ขึ้นเป็นราชินี"
+      ]
+    },
+    {
+      "id": "101176",
+      "name": "เดซี่",
+      "baseName": "เดซี่",
+      "tier": "ทองล่าง",
+      "tierLabel": "ทองล่าง",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_101176.webp",
+      "aliases": [
+        "Daisy",
+        "ผีเสื้อสีแดง"
+      ]
+    },
+    {
+      "id": "101146",
+      "name": "ทากะ",
+      "baseName": "ทากะ",
+      "tier": "ทองล่าง",
+      "tierLabel": "ทองล่าง",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_101146.webp",
+      "aliases": [
+        "Taka",
+        "ไนท์โครว"
+      ]
+    },
+    {
+      "id": "101006",
+      "name": "ปาสคาล",
+      "baseName": "ปาสคาล",
+      "tier": "ทองล่าง",
+      "tierLabel": "ทองล่าง",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_101006.webp",
+      "aliases": [
+        "Pascal",
+        "จักรพรรดิ"
+      ]
+    },
+    {
+      "id": "100966",
+      "name": "อารากอน",
+      "baseName": "อารากอน",
+      "tier": "ทองล่าง",
+      "tierLabel": "ทองล่าง",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_100966.webp",
+      "aliases": [
+        "Aragon",
+        "ผู้บัญชาการสูงสุด"
+      ]
+    },
+    {
+      "id": "100956",
+      "name": "อลิซ",
+      "baseName": "อลิซ",
+      "tier": "ทองล่าง",
+      "tierLabel": "ทองล่าง",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_100956.webp",
+      "aliases": [
+        "Alice",
+        "สาวโรแมนติก"
+      ]
+    },
+    {
+      "id": "100916",
+      "name": "บาลิสต้า",
+      "baseName": "บาลิสต้า",
+      "tier": "ทองล่าง",
+      "tierLabel": "ทองล่าง",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_100916.webp",
+      "aliases": [
+        "Ballista",
+        "นักล่าเงา"
+      ]
+    },
+    {
+      "id": "100906",
+      "name": "ชานซะเลอร์",
+      "baseName": "ชานซะเลอร์",
+      "tier": "ทองล่าง",
+      "tierLabel": "ทองล่าง",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_100906.webp",
+      "aliases": [
+        "Chancellor",
+        "หัวหน้าหน่วยองครักษ์",
+        "ชานชะเลอร์",
+        "chancellor"
+      ]
+    },
+    {
+      "id": "100896",
+      "name": "ลุค",
+      "baseName": "ลุค",
+      "tier": "ทองล่าง",
+      "tierLabel": "ทองล่าง",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_100896.webp",
+      "aliases": [
+        "Rook",
+        "หน่วยองครักษ์"
+      ]
+    },
+    {
+      "id": "100886",
+      "name": "ซีค",
+      "baseName": "ซีค",
+      "tier": "ทองล่าง",
+      "tierLabel": "ทองล่าง",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_100886.webp",
+      "aliases": [
+        "Sieg",
+        "เจ้าของดาบปีศาจ"
+      ]
+    },
+    {
+      "id": "100876",
+      "name": "เซอิน",
+      "baseName": "เซอิน",
+      "tier": "ทองล่าง",
+      "tierLabel": "ทองล่าง",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_100876.webp",
+      "aliases": [
+        "Shane",
+        "ผู้ผนึกปีศาจ",
+        "เชน",
+        "shane"
+      ]
+    },
+    {
+      "id": "100866",
+      "name": "เอสปาด้า",
+      "baseName": "เอสปาด้า",
+      "tier": "ทองล่าง",
+      "tierLabel": "ทองล่าง",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_100866.webp",
+      "aliases": [
+        "Espada",
+        "นักล่าปีศาจ"
+      ]
+    },
+    {
+      "id": "100856",
+      "name": "เนีย",
+      "baseName": "เนีย",
+      "tier": "ทองล่าง",
+      "tierLabel": "ทองล่าง",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_100856.webp",
+      "aliases": [
+        "Nia",
+        "วิศวกรรมเวท โบลท์"
+      ]
+    },
+    {
+      "id": "100846",
+      "name": "ลูลี่",
+      "baseName": "ลูลี่",
+      "tier": "ทองล่าง",
+      "tierLabel": "ทองล่าง",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_100846.webp",
+      "aliases": [
+        "Ruri",
+        "กระสุนศักดิ์สิทธิ์"
+      ]
+    },
+    {
+      "id": "100726",
+      "name": "รีน่า",
+      "baseName": "รีน่า",
+      "tier": "ทองล่าง",
+      "tierLabel": "ทองล่าง",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_100726.webp",
+      "aliases": [
+        "Lina",
+        "บทกวีในตำนาน"
+      ]
+    },
+    {
+      "id": "100706",
+      "name": "พีดัม",
+      "baseName": "พีดัม",
+      "tier": "ทองล่าง",
+      "tierLabel": "ทองล่าง",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_100706.webp",
+      "aliases": [
+        "Bi Dam",
+        "เจ้าแห่งวายุจันทรา"
+      ]
+    },
+    {
+      "id": "100696",
+      "name": "ยูชิน",
+      "baseName": "ยูชิน",
+      "tier": "ทองล่าง",
+      "tierLabel": "ทองล่าง",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_100696.webp",
+      "aliases": [
+        "Yu Shin",
+        "ผู้บำเพ็ญตนสวรรค์"
+      ]
+    },
+    {
+      "id": "400677",
+      "name": "เฮฟเว่นเนีย awake epic",
+      "baseName": "เฮฟเว่นเนีย",
+      "tier": "epic awake",
+      "tierLabel": "Epic Awake",
+      "awakened": true,
+      "imageUrl": "/assets/catalog/negilab_400677.webp",
+      "aliases": [
+        "เฮฟเว่นเนีย",
+        "Heavenia",
+        "นวดาราอันเยือกเย็น"
+      ]
+    },
+    {
+      "id": "400667",
+      "name": "เฮเลเนีย awake epic",
+      "baseName": "เฮเลเนีย",
+      "tier": "epic awake",
+      "tierLabel": "Epic Awake",
+      "awakened": true,
+      "imageUrl": "/assets/catalog/negilab_400667.webp",
+      "aliases": [
+        "เฮเลเนีย",
+        "Hellenia",
+        "นวดาราอันลุกโชน"
+      ]
+    },
+    {
+      "id": "101856",
+      "name": "เสี่ยว",
+      "baseName": "เสี่ยว",
+      "tier": "อีปิค",
+      "tierLabel": "อีปิค",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_101856.webp",
+      "aliases": [
+        "Xiao",
+        "ผู้สูญเสียนายท่าน"
+      ]
+    },
+    {
+      "id": "101766",
+      "name": "อีจูฮี",
+      "baseName": "อีจูฮี",
+      "tier": "อีปิค",
+      "tierLabel": "อีปิค",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_101766.webp",
+      "aliases": [
+        "Lee Joohee",
+        "ทีมดูแลชายหาดแฮอุนแด",
+        "อีจูฉี",
+        "lee joohee"
+      ]
+    },
+    {
+      "id": "101756",
+      "name": "ยูจินโฮ",
+      "baseName": "ยูจินโฮ",
+      "tier": "อีปิค",
+      "tierLabel": "อีปิค",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_101756.webp",
+      "aliases": [
+        "Yoo Jinho",
+        "ซัพพอร์ตเตอร์ที่จริงใจ"
+      ]
+    },
+    {
+      "id": "101596",
+      "name": "จูล่ง",
+      "baseName": "จูล่ง",
+      "tier": "อีปิค",
+      "tierLabel": "อีปิค",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_101596.webp",
+      "aliases": [
+        "Zhao Yun",
+        "พระยาสามัญ"
+      ]
+    },
+    {
+      "id": "101496",
+      "name": "หลิงหลิง",
+      "baseName": "หลิงหลิง",
+      "tier": "อีปิค",
+      "tierLabel": "อีปิค",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_101496.webp",
+      "aliases": [
+        "Ling Ling",
+        "พลังบริสุทธิ์"
+      ]
+    },
+    {
+      "id": "101186",
+      "name": "เรย์",
+      "baseName": "เรย์",
+      "tier": "อีปิค",
+      "tierLabel": "อีปิค",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_101186.webp",
+      "aliases": [
+        "Rei",
+        "การแก้แค้นชั่วนิรันดร์"
+      ]
+    },
+    {
+      "id": "101166",
+      "name": "จิน",
+      "baseName": "จิน",
+      "tier": "อีปิค",
+      "tierLabel": "อีปิค",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_101166.webp",
+      "aliases": [
+        "Jin",
+        "หมัดเหล็ก"
+      ]
+    },
+    {
+      "id": "101156",
+      "name": "แคทตี้",
+      "baseName": "แคทตี้",
+      "tier": "อีปิค",
+      "tierLabel": "อีปิค",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_101156.webp",
+      "aliases": [
+        "Catty",
+        "อวตารของแมว"
+      ]
+    },
+    {
+      "id": "101116",
+      "name": "แบล็คโรส",
+      "baseName": "แบล็คโรส",
+      "tier": "อีปิค",
+      "tierLabel": "อีปิค",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_101116.webp",
+      "aliases": [
+        "Black Rose",
+        "ดอกไม้บานยามราตรี"
+      ]
+    },
+    {
+      "id": "100996",
+      "name": "อสุรา",
+      "baseName": "อสุรา",
+      "tier": "อีปิค",
+      "tierLabel": "อีปิค",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_100996.webp",
+      "aliases": [
+        "Asura",
+        "องครักษ์ราชวงศ์"
+      ]
+    },
+    {
+      "id": "100986",
+      "name": "โนโฮ",
+      "baseName": "โนโฮ",
+      "tier": "อีปิค",
+      "tierLabel": "อีปิค",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_100986.webp",
+      "aliases": [
+        "Noho",
+        "ผู้บันทึกประวัติศาสตร์"
+      ]
+    },
+    {
+      "id": "100976",
+      "name": "โคลอี้",
+      "baseName": "โคลอี้",
+      "tier": "อีปิค",
+      "tierLabel": "อีปิค",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_100976.webp",
+      "aliases": [
+        "Chloe",
+        "เจ้าของร้านค้าใบเรียก"
+      ]
+    },
+    {
+      "id": "100946",
+      "name": "เมย์",
+      "baseName": "เมย์",
+      "tier": "อีปิค",
+      "tierLabel": "อีปิค",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_100946.webp",
+      "aliases": [
+        "May",
+        "คนส่งความรัก"
+      ]
+    },
+    {
+      "id": "100936",
+      "name": "เซร่า",
+      "baseName": "เซร่า",
+      "tier": "อีปิค",
+      "tierLabel": "อีปิค",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_100936.webp",
+      "aliases": [
+        "Sera",
+        "เจ้านายของวิญญาณ"
+      ]
+    },
+    {
+      "id": "100926",
+      "name": "เจน",
+      "baseName": "เจน",
+      "tier": "อีปิค",
+      "tierLabel": "อีปิค",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_100926.webp",
+      "aliases": [
+        "Jane",
+        "นักฆ่าผู้เงียบงัน"
+      ]
+    },
+    {
+      "id": "100836",
+      "name": "ยูอิ",
+      "baseName": "ยูอิ",
+      "tier": "อีปิค",
+      "tierLabel": "อีปิค",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_100836.webp",
+      "aliases": [
+        "Yui",
+        "มาเอสโตร"
+      ]
+    },
+    {
+      "id": "100826",
+      "name": "ซิลเวีย",
+      "baseName": "ซิลเวีย",
+      "tier": "อีปิค",
+      "tierLabel": "อีปิค",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_100826.webp",
+      "aliases": [
+        "Sylvia",
+        "หมอผีจิตวิญญาณ"
+      ]
+    },
+    {
+      "id": "100806",
+      "name": "ลูซี่",
+      "baseName": "ลูซี่",
+      "tier": "อีปิค",
+      "tierLabel": "อีปิค",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_100806.webp",
+      "aliases": [
+        "Lucy",
+        "เจ้าแห่งเทคนิค"
+      ]
+    },
+    {
+      "id": "100796",
+      "name": "วิคตอเรีย",
+      "baseName": "วิคตอเรีย",
+      "tier": "อีปิค",
+      "tierLabel": "อีปิค",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_100796.webp",
+      "aliases": [
+        "Victoria",
+        "ราชาโจรสลัด"
+      ]
+    },
+    {
+      "id": "100786",
+      "name": "คารอน",
+      "baseName": "คารอน",
+      "tier": "อีปิค",
+      "tierLabel": "อีปิค",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_100786.webp",
+      "aliases": [
+        "Karon",
+        "ผู้พิทักษ์แห่งพงไพร"
+      ]
+    },
+    {
+      "id": "100776",
+      "name": "โจ๊กเกอร์",
+      "baseName": "โจ๊กเกอร์",
+      "tier": "อีปิค",
+      "tierLabel": "อีปิค",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_100776.webp",
+      "aliases": [
+        "Joker",
+        "นักมายากลภาพลวงตา"
+      ]
+    },
+    {
+      "id": "100766",
+      "name": "คาริน",
+      "baseName": "คาริน",
+      "tier": "อีปิค",
+      "tierLabel": "อีปิค",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_100766.webp",
+      "aliases": [
+        "Karin",
+        "หญิงนักบุญ"
+      ]
+    },
+    {
+      "id": "100756",
+      "name": "อีวาน",
+      "baseName": "อีวาน",
+      "tier": "อีปิค",
+      "tierLabel": "อีปิค",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_100756.webp",
+      "aliases": [
+        "Evan",
+        "ผู้บัญชาการสูงสุด"
+      ]
+    },
+    {
+      "id": "100746",
+      "name": "จูพี้",
+      "baseName": "จูพี้",
+      "tier": "อีปิค",
+      "tierLabel": "อีปิค",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_100746.webp",
+      "aliases": [
+        "Jupy",
+        "ลูกธนูเจาะทะลุ",
+        "จูพี",
+        "jupy"
+      ]
+    },
+    {
+      "id": "100736",
+      "name": "สนิปเปอร์",
+      "baseName": "สนิปเปอร์",
+      "tier": "อีปิค",
+      "tierLabel": "อีปิค",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_100736.webp",
+      "aliases": [
+        "Snipper",
+        "นักล่าในตำนาน"
+      ]
+    },
+    {
+      "id": "100716",
+      "name": "โซอี",
+      "baseName": "โซอี",
+      "tier": "อีปิค",
+      "tierLabel": "อีปิค",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_100716.webp",
+      "aliases": [
+        "Soi",
+        "นัยน์ตาเหยี่ยว"
+      ]
+    },
+    {
+      "id": "100686",
+      "name": "เฟิงเยี่ยน",
+      "baseName": "เฟิงเยี่ยน",
+      "tier": "อีปิค",
+      "tierLabel": "อีปิค",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_100686.webp",
+      "aliases": [
+        "Feng Yan",
+        "จ้าวแห่งดาบพายุ"
+      ]
+    },
+    {
+      "id": "100656",
+      "name": "เอเรียล",
+      "baseName": "เอเรียล",
+      "tier": "อีปิค",
+      "tierLabel": "อีปิค",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_100656.webp",
+      "aliases": [
+        "Ariel",
+        "พรแห่งแสง"
+      ]
+    },
+    {
+      "id": "100646",
+      "name": "ลี",
+      "baseName": "ลี",
+      "tier": "อีปิค",
+      "tierLabel": "อีปิค",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_100646.webp",
+      "aliases": [
+        "Li",
+        "นักบวชนอกรีตแห่งโทสะ"
+      ]
+    },
+    {
+      "id": "100486",
+      "name": "ซาร่า",
+      "baseName": "ซาร่า",
+      "tier": "อีปิค",
+      "tierLabel": "อีปิค",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_100486.webp",
+      "aliases": [
+        "Sarah",
+        "ราชินีซัคคิวบัส"
+      ]
+    },
+    {
+      "id": "100426",
+      "name": "ลาเนีย",
+      "baseName": "ลาเนีย",
+      "tier": "อีปิค",
+      "tierLabel": "อีปิค",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_100426.webp",
+      "aliases": [
+        "Lania",
+        "เจ้าแห่งทุ่งหิมะ"
+      ]
+    },
+    {
+      "id": "100356",
+      "name": "คลีโอ",
+      "baseName": "คลีโอ",
+      "tier": "อีปิค",
+      "tierLabel": "อีปิค",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_100356.webp",
+      "aliases": [
+        "Cleo",
+        "สายตาแห่งความพินาศ",
+        "ตลีโอ",
+        "cleo"
+      ]
+    },
+    {
+      "id": "100286",
+      "name": "เบน",
+      "baseName": "เบน",
+      "tier": "อีปิค",
+      "tierLabel": "อีปิค",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_100286.webp",
+      "aliases": [
+        "Bane",
+        "กบฏแห่งความทะเยอทะยาน"
+      ]
+    },
+    {
+      "id": "100216",
+      "name": "ลีโอ",
+      "baseName": "ลีโอ",
+      "tier": "อีปิค",
+      "tierLabel": "อีปิค",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_100216.webp",
+      "aliases": [
+        "Leo",
+        "การล้างแค้นสีดำ"
+      ]
+    },
+    {
+      "id": "100186",
+      "name": "ยูริ",
+      "baseName": "ยูริ",
+      "tier": "อีปิค",
+      "tierLabel": "อีปิค",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_100186.webp",
+      "aliases": [
+        "Yuri",
+        "หัวหน้าจิ้งจอกสามหาง"
+      ]
+    },
+    {
+      "id": "100146",
+      "name": "แรคคูน",
+      "baseName": "แรคคูน",
+      "tier": "อีปิค",
+      "tierLabel": "อีปิค",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_100146.webp",
+      "aliases": [
+        "Rahkun",
+        "ผู้ครอบครองเหมือง"
+      ]
+    },
+    {
+      "id": "100076",
+      "name": "โฮกิ้น",
+      "baseName": "โฮกิ้น",
+      "tier": "อีปิค",
+      "tierLabel": "อีปิค",
+      "awakened": false,
+      "imageUrl": "/assets/catalog/negilab_100076.webp",
+      "aliases": [
+        "Hokin",
+        "ก็อบลิน หัวหน้าเผ่าสูงสุด"
+      ]
+    }
+  ],
+  "pets": [
+    {
+      "name": "เนซึโกะ",
+      "tier": "เลเจนด์",
+      "tierLabel": "เลเจนด์",
+      "imageUrl": "/assets/catalog/pet_nezuko_pet.png",
+      "aliases": [
+        "เนซึโกะ",
+        "คามาโดะ เนซึโกะ",
+        "nezuko",
+        "ดาบพิฆาตอสูร"
+      ]
+    },
+    {
+      "name": "อีรีน",
+      "tier": "เลเจนด์",
+      "tierLabel": "เลเจนด์",
+      "imageUrl": "/assets/catalog/pets-legend_80.webp",
+      "aliases": []
+    },
+    {
+      "name": "ยอนจี",
+      "tier": "เลเจนด์",
+      "tierLabel": "เลเจนด์",
+      "imageUrl": "/assets/catalog/pets-legend_75.webp",
+      "aliases": []
+    },
+    {
+      "name": "ยู",
+      "tier": "เลเจนด์",
+      "tierLabel": "เลเจนด์",
+      "imageUrl": "/assets/catalog/pets-legend_76.webp",
+      "aliases": []
+    },
+    {
+      "name": "ลู",
+      "tier": "เลเจนด์",
+      "tierLabel": "เลเจนด์",
+      "imageUrl": "/assets/catalog/pets-legend_78.webp",
+      "aliases": []
+    },
+    {
+      "name": "คารัม",
+      "tier": "เลเจนด์",
+      "tierLabel": "เลเจนด์",
+      "imageUrl": "/assets/catalog/pets-legend_71.webp",
+      "aliases": []
+    },
+    {
+      "name": "ไพค์",
+      "tier": "เลเจนด์",
+      "tierLabel": "เลเจนด์",
+      "imageUrl": "/assets/catalog/pets-legend_86.webp",
+      "aliases": []
+    },
+    {
+      "name": "เมลแปร์โรว์",
+      "tier": "เลเจนด์",
+      "tierLabel": "เลเจนด์",
+      "imageUrl": "/assets/catalog/pets-legend_83.webp",
+      "aliases": []
+    },
+    {
+      "name": "วินดี้",
+      "tier": "เลเจนด์",
+      "tierLabel": "เลเจนด์",
+      "imageUrl": "/assets/catalog/pets-legend_79.webp",
+      "aliases": []
+    },
+    {
+      "name": "จีฟ",
+      "tier": "เลเจนด์",
+      "tierLabel": "เลเจนด์",
+      "imageUrl": "/assets/catalog/pets-legend_72.webp",
+      "aliases": []
+    },
+    {
+      "name": "เจโอ",
+      "tier": "เลเจนด์",
+      "tierLabel": "เลเจนด์",
+      "imageUrl": "/assets/catalog/pets-legend_81.webp",
+      "aliases": []
+    },
+    {
+      "name": "โยรัง",
+      "tier": "เลเจนด์",
+      "tierLabel": "เลเจนด์",
+      "imageUrl": "/assets/catalog/pets-legend_85.webp",
+      "aliases": []
+    },
+    {
+      "name": "รีเซล",
+      "tier": "เลเจนด์",
+      "tierLabel": "เลเจนด์",
+      "imageUrl": "/assets/catalog/pets-legend_77.webp",
+      "aliases": []
+    },
+    {
+      "name": "ครี",
+      "tier": "เลเจนด์",
+      "tierLabel": "เลเจนด์",
+      "imageUrl": "/assets/catalog/pets-legend_70.webp",
+      "aliases": []
+    },
+    {
+      "name": "เดลโล่",
+      "tier": "เลเจนด์",
+      "tierLabel": "เลเจนด์",
+      "imageUrl": "/assets/catalog/pets-legend_82.webp",
+      "aliases": []
+    },
+    {
+      "name": "ดอจ",
+      "tier": "เลเจนด์",
+      "tierLabel": "เลเจนด์",
+      "imageUrl": "/assets/catalog/pets-legend_73.webp",
+      "aliases": []
+    },
+    {
+      "name": "มิค",
+      "tier": "เลเจนด์",
+      "tierLabel": "เลเจนด์",
+      "imageUrl": "/assets/catalog/pets-legend_74.webp",
+      "aliases": []
+    },
+    {
+      "name": "เอริ",
+      "tier": "เลเจนด์",
+      "tierLabel": "เลเจนด์",
+      "imageUrl": "/assets/catalog/pets-legend_84.webp",
+      "aliases": []
+    },
+    {
+      "name": "โน้ต",
+      "tier": "อีปิค",
+      "tierLabel": "อีปิค",
+      "imageUrl": "/assets/catalog/pets-epic_69.webp",
+      "aliases": []
+    },
+    {
+      "name": "เซริ",
+      "tier": "อีปิค",
+      "tierLabel": "อีปิค",
+      "imageUrl": "/assets/catalog/pets-epic_65.webp",
+      "aliases": []
+    },
+    {
+      "name": "โครอา",
+      "tier": "อีปิค",
+      "tierLabel": "อีปิค",
+      "imageUrl": "/assets/catalog/pets-epic_68.webp",
+      "aliases": []
+    },
+    {
+      "name": "พารากอน",
+      "tier": "อีปิค",
+      "tierLabel": "อีปิค",
+      "imageUrl": "/assets/catalog/pets-epic_62.webp",
+      "aliases": []
+    },
+    {
+      "name": "เฮเลพิน",
+      "tier": "อีปิค",
+      "tierLabel": "อีปิค",
+      "imageUrl": "/assets/catalog/pets-epic_67.webp",
+      "aliases": []
+    },
+    {
+      "name": "เฟิงน้อย",
+      "tier": "อีปิค",
+      "tierLabel": "อีปิค",
+      "imageUrl": "/assets/catalog/pets-epic_66.webp",
+      "aliases": []
+    },
+    {
+      "name": "นีน่า",
+      "tier": "อีปิค",
+      "tierLabel": "อีปิค",
+      "imageUrl": "/assets/catalog/pets-epic_61.webp",
+      "aliases": []
+    },
+    {
+      "name": "นิกิ",
+      "tier": "อีปิค",
+      "tierLabel": "อีปิค",
+      "imageUrl": "/assets/catalog/pets-epic_60.webp",
+      "aliases": []
+    },
+    {
+      "name": "มิวมิว",
+      "tier": "อีปิค",
+      "tierLabel": "อีปิค",
+      "imageUrl": "/assets/catalog/pets-epic_63.webp",
+      "aliases": []
+    },
+    {
+      "name": "มีมิค",
+      "tier": "อีปิค",
+      "tierLabel": "อีปิค",
+      "imageUrl": "/assets/catalog/pets-epic_64.webp",
+      "aliases": []
+    },
+    {
+      "name": "ทู",
+      "tier": "อีปิค",
+      "tierLabel": "อีปิค",
+      "imageUrl": "/assets/catalog/pets-epic_59.webp",
+      "aliases": []
+    }
+  ],
+  "equipSets": [
+    {
+      "name": "นักฆ่า",
+      "hint": "คริ",
+      "aliases": [
+        "คริ"
+      ],
+      "imageUrl": "/assets/catalog/equip-sets_50.webp"
+    },
+    {
+      "name": "นายประตู",
+      "hint": "บล็อค",
+      "aliases": [
+        "บล็อค"
+      ],
+      "imageUrl": "/assets/catalog/equip-sets_51.webp"
+    },
+    {
+      "name": "ผู้บัญชาการ",
+      "hint": "โจมตี",
+      "aliases": [
+        "โจมตี"
+      ],
+      "imageUrl": "/assets/catalog/equip-sets_52.webp"
+    },
+    {
+      "name": "ผู้ปรับสมดุล",
+      "hint": "ต้านทาน",
+      "aliases": [
+        "ต้านทาน"
+      ],
+      "imageUrl": "/assets/catalog/equip-sets_53.webp"
+    },
+    {
+      "name": "ผู้พิทักษ์",
+      "hint": "ป้องกัน",
+      "aliases": [
+        "ป้องกัน"
+      ],
+      "imageUrl": "/assets/catalog/equip-sets_54.webp"
+    },
+    {
+      "name": "ผู้ล้างแค้น",
+      "hint": "บอส",
+      "aliases": [
+        "บอส"
+      ],
+      "imageUrl": "/assets/catalog/equip-sets_55.webp"
+    },
+    {
+      "name": "ผู้ไล่ล่า",
+      "hint": "จุดอ่อน",
+      "aliases": [
+        "จุดอ่อน"
+      ],
+      "imageUrl": "/assets/catalog/equip-sets_56.webp"
+    },
+    {
+      "name": "หมอผี",
+      "hint": "เข้าเป้า",
+      "aliases": [
+        "เข้าเป้า"
+      ],
+      "imageUrl": "/assets/catalog/equip-sets_57.webp"
+    },
+    {
+      "name": "อัศวินศักดิ์สิทธิ์",
+      "hint": "เลือด",
+      "aliases": [
+        "เลือด"
+      ],
+      "imageUrl": "/assets/catalog/equip-sets_58.webp"
+    }
+  ],
+  "equipRings": [
+    {
+      "name": "แหวนแห่งการคีนชีพ",
+      "hint": "แหวนตายเกิด",
+      "aliases": [
+        "แหวนตายเกิด"
+      ],
+      "imageUrl": "/assets/catalog/equip-rings_37.webp"
+    },
+    {
+      "name": "แหวนอมตะ",
+      "hint": "",
+      "aliases": [],
+      "imageUrl": "/assets/catalog/equip-rings_31.webp"
+    },
+    {
+      "name": "แหวนแห่งอำนาจ",
+      "hint": "",
+      "aliases": [],
+      "imageUrl": "/assets/catalog/equip-rings_48.webp"
+    },
+    {
+      "name": "แหวนแห่งพลังกายใจ",
+      "hint": "โล่แดง, โล่โจมตี",
+      "aliases": [
+        "โล่แดง",
+        "โล่โจมตี"
+      ],
+      "imageUrl": "/assets/catalog/equip-rings_44.webp"
+    },
+    {
+      "name": "แหวนกำแพงเหล็ก",
+      "hint": "โล่ฟ้า, โล่เกราะ",
+      "aliases": [
+        "โล่ฟ้า",
+        "โล่เกราะ"
+      ],
+      "imageUrl": "/assets/catalog/equip-rings_19.webp"
+    },
+    {
+      "name": "แหวนแห่งสุขภาพ",
+      "hint": "โล่เขียว, โล่เลือด",
+      "aliases": [
+        "โล่เขียว",
+        "โล่เลือด"
+      ],
+      "imageUrl": "/assets/catalog/equip-rings_46.webp"
+    },
+    {
+      "name": "แหวนแห่งการปราบปราม",
+      "hint": "แหวนบอส",
+      "aliases": [
+        "แหวนบอส"
+      ],
+      "imageUrl": "/assets/catalog/equip-rings_39.webp"
+    },
+    {
+      "name": "แหวนช่วงชิงปราสาท",
+      "hint": "แหวนเป้าเดี่ยว",
+      "aliases": [
+        "แหวนเป้าเดี่ยว"
+      ],
+      "imageUrl": "/assets/catalog/equip-rings_21.webp"
+    },
+    {
+      "name": "แหวนแห่งการทำลายล้าง",
+      "hint": "แหวนฟาร์ม",
+      "aliases": [
+        "แหวนฟาร์ม"
+      ],
+      "imageUrl": "/assets/catalog/equip-rings_38.webp"
+    },
+    {
+      "name": "แหวนเลือดนักสู้",
+      "hint": "",
+      "aliases": [],
+      "imageUrl": "/assets/catalog/equip-rings_34.webp"
+    },
+    {
+      "name": "แหวนแห่งโอกาส",
+      "hint": "หมดสติ",
+      "aliases": [
+        "หมดสติ"
+      ],
+      "imageUrl": "/assets/catalog/equip-rings_49.webp"
+    },
+    {
+      "name": "แหวนเปล่งประกาย",
+      "hint": "ไฟช็อต",
+      "aliases": [
+        "ไฟช็อต"
+      ],
+      "imageUrl": "/assets/catalog/equip-rings_32.webp"
+    },
+    {
+      "name": "แหวนแห่งหายนะ",
+      "hint": "อัมพาต",
+      "aliases": [
+        "อัมพาต"
+      ],
+      "imageUrl": "/assets/catalog/equip-rings_47.webp"
+    },
+    {
+      "name": "แหวนต้องสาป",
+      "hint": "ใบ้",
+      "aliases": [
+        "ใบ้"
+      ],
+      "imageUrl": "/assets/catalog/equip-rings_23.webp"
+    },
+    {
+      "name": "แหวนเวทย์มน",
+      "hint": "ขจัดบัฟ",
+      "aliases": [
+        "ขจัดบัฟ"
+      ],
+      "imageUrl": "/assets/catalog/equip-rings_35.webp"
+    },
+    {
+      "name": "แหวนกาลเวลา",
+      "hint": "ลดเทิร์นบัฟ",
+      "aliases": [
+        "ลดเทิร์นบัฟ"
+      ],
+      "imageUrl": "/assets/catalog/equip-rings_18.webp"
+    },
+    {
+      "name": "แหวนแห่งความหวาดกลัว",
+      "hint": "ตาบอด",
+      "aliases": [
+        "ตาบอด"
+      ],
+      "imageUrl": "/assets/catalog/equip-rings_42.webp"
+    },
+    {
+      "name": "แหวนแห่งทุ่งหิมะ",
+      "hint": "แช่แข็ง",
+      "aliases": [
+        "แช่แข็ง"
+      ],
+      "imageUrl": "/assets/catalog/equip-rings_43.webp"
+    },
+    {
+      "name": "แหวนเมดูซา",
+      "hint": "หิน",
+      "aliases": [
+        "หิน"
+      ],
+      "imageUrl": "/assets/catalog/equip-rings_33.webp"
+    },
+    {
+      "name": "แหวนแห่งความฝัน",
+      "hint": "หลับ",
+      "aliases": [
+        "หลับ"
+      ],
+      "imageUrl": "/assets/catalog/equip-rings_41.webp"
+    },
+    {
+      "name": "แหวนหนาม",
+      "hint": "เลือดไหล",
+      "aliases": [
+        "เลือดไหล"
+      ],
+      "imageUrl": "/assets/catalog/equip-rings_30.webp"
+    },
+    {
+      "name": "แหวนซาลาแมนเดอร์",
+      "hint": "ไฟ, เผาไหม้",
+      "aliases": [
+        "ไฟ",
+        "เผาไหม้"
+      ],
+      "imageUrl": "/assets/catalog/equip-rings_22.webp"
+    },
+    {
+      "name": "แหวนพิษ",
+      "hint": "พิษ",
+      "aliases": [
+        "พิษ"
+      ],
+      "imageUrl": "/assets/catalog/equip-rings_28.webp"
+    },
+    {
+      "name": "แหวนแห่งความตาย",
+      "hint": "เดธ",
+      "aliases": [
+        "เดธ"
+      ],
+      "imageUrl": "/assets/catalog/equip-rings_40.webp"
+    },
+    {
+      "name": "แหวนล้างแค้น",
+      "hint": "",
+      "aliases": [],
+      "imageUrl": "/assets/catalog/equip-rings_29.webp"
+    },
+    {
+      "name": "แหวนนำโชค",
+      "hint": "คริ",
+      "aliases": [
+        "คริ"
+      ],
+      "imageUrl": "/assets/catalog/equip-rings_26.webp"
+    },
+    {
+      "name": "แหวนแห่งสมาธิ",
+      "hint": "จุดอ่อน",
+      "aliases": [
+        "จุดอ่อน"
+      ],
+      "imageUrl": "/assets/catalog/equip-rings_45.webp"
+    },
+    {
+      "name": "แหวนคุ้มครอง",
+      "hint": "ป้องกัน, เดฟ",
+      "aliases": [
+        "ป้องกัน",
+        "เดฟ"
+      ],
+      "imageUrl": "/assets/catalog/equip-rings_20.webp"
+    },
+    {
+      "name": "แหวนพิทักษ์",
+      "hint": "บล็อค",
+      "aliases": [
+        "บล็อค"
+      ],
+      "imageUrl": "/assets/catalog/equip-rings_27.webp"
+    },
+    {
+      "name": "แหวนธรรมชาติ",
+      "hint": "HP, เลือด",
+      "aliases": [
+        "HP",
+        "เลือด"
+      ],
+      "imageUrl": "/assets/catalog/equip-rings_25.webp"
+    },
+    {
+      "name": "แหวนแม่นยำ",
+      "hint": "เข้าเป้า",
+      "aliases": [
+        "เข้าเป้า"
+      ],
+      "imageUrl": "/assets/catalog/equip-rings_36.webp"
+    },
+    {
+      "name": "แหวนต้านทาน",
+      "hint": "",
+      "aliases": [],
+      "imageUrl": "/assets/catalog/equip-rings_24.webp"
+    }
+  ],
+  "patchMeta": {
+    "lastUpdated": "2026-10-09 00:17:30",
+    "syncedAt": "2026-10-17T12:27:15.280Z",
+    "totalCharacters": 123,
+    "source": "Seven Knights Re:BIRTH Game Files (negi-lab) & Netmarble Forum",
+    "forumUrl": "https://forum.netmarble.com/tskgb",
+    "forumArticles": [
+      {
+        "id": 6468,
+        "title": "10/16 (Fri) Server Patch [Completed]",
+        "createdAt": "2026-10-16T12:51:01.545Z",
+        "url": "https://forum.netmarble.com/sk_rebirth_gl/view/10/6468"
+      },
+      {
+        "id": 6465,
+        "title": "ประกาศแพตช์เซิร์ฟเวอร์ 16 ตุลาคม 2026 [ดำเนินการเรียบร้อยแล้ว]",
+        "createdAt": "2026-10-16T12:50:55.460Z",
+        "url": "https://forum.netmarble.com/sk_rebirth_gl/view/10/6465"
+      },
+      {
+        "id": 6464,
+        "title": "10/16(五) 伺服器依序更新公告 [結束]",
+        "createdAt": "2026-10-16T12:50:15.383Z",
+        "url": "https://forum.netmarble.com/sk_rebirth_gl/view/10/6464"
+      },
+      {
+        "id": 6463,
+        "title": "ประกาศล่วงหน้าเกี่ยวกับการปรับปรุงแบ่งลีกอารีน่า และรีเซตคะแนนซีซัน",
+        "createdAt": "2026-10-16T08:00:07.540Z",
+        "url": "https://forum.netmarble.com/sk_rebirth_gl/view/10/6463"
+      },
+      {
+        "id": 6461,
+        "title": "Advanced Notice on Arena League Separation Improvements and Score Reset ",
+        "createdAt": "2026-10-16T08:00:07.462Z",
+        "url": "https://forum.netmarble.com/sk_rebirth_gl/view/10/6461"
+      },
+      {
+        "id": 6460,
+        "title": "決鬥場群組分離改善與賽季分數重置相關事前公告",
+        "createdAt": "2026-10-16T08:00:07.434Z",
+        "url": "https://forum.netmarble.com/sk_rebirth_gl/view/10/6460"
+      }
+    ]
+  }
+}
