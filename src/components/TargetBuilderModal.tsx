@@ -5,6 +5,7 @@ import {
   CHARACTERS,
   PETS,
   STRATEGIES,
+  TEAM_TYPES,
   CHARACTER_TIERS,
   PET_TIERS,
   getCharacterInfo,
@@ -29,11 +30,14 @@ export const TargetBuilderModal: React.FC<TargetBuilderModalProps> = ({
   const [isFortress, setIsFortress] = useState<boolean>(initialTarget?.isFortress || false);
   const [customName, setCustomName] = useState<string>(initialTarget?.customName || '');
   const [tagsInput, setTagsInput] = useState<string>(
-    initialTarget?.tags ? initialTarget.tags.join(', ') : 'แทงก์, ถึก'
+    initialTarget?.tags ? initialTarget.tags.join(', ') : 'กายภาพ'
   );
   const [note, setNote] = useState<string>(initialTarget?.note || '');
 
-  // Formation
+  // Team Type & Formation
+  const [teamType, setTeamType] = useState<TeamType>(
+    initialTarget?.enemyTeam?.teamType || 'physical'
+  );
   const [strategyId, setStrategyId] = useState<StrategyId>(
     initialTarget?.enemyTeam?.strategyId || '1-4'
   );
@@ -123,6 +127,7 @@ export const TargetBuilderModal: React.FC<TargetBuilderModalProps> = ({
 
     const enemyTeam: EnemyTeam = {
       strategyId,
+      teamType,
       front: { characters: frontChars },
       back: { characters: backChars },
       pets: [selectedPet, null, null, null, null],
@@ -288,6 +293,29 @@ export const TargetBuilderModal: React.FC<TargetBuilderModalProps> = ({
                   }`}
                 >
                   {s.name}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Team Type Selection */}
+          <div className="space-y-1.5">
+            <label className="block text-xs font-bold text-slate-300">
+              สายของทีม (Team Type)
+            </label>
+            <div className="grid grid-cols-4 gap-2">
+              {TEAM_TYPES.map((tt) => (
+                <button
+                  key={tt.id}
+                  type="button"
+                  onClick={() => setTeamType(tt.id)}
+                  className={`py-1.5 px-1 text-center rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                    teamType === tt.id
+                      ? `${tt.badgeClass} ring-1 ring-current`
+                      : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white'
+                  }`}
+                >
+                  {tt.label}
                 </button>
               ))}
             </div>

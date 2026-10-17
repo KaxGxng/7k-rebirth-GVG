@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 import type { TargetHouse, TargetCounterTeam, EnemyTeam, CounterTeam } from '../types';
 import { TeamFormationView } from './TeamFormationView';
-import { getCharacterInfo, getPetInfo } from '../lib/catalog';
+import { getCharacterInfo, getPetInfo, getTeamTypeMeta } from '../lib/catalog';
 
 interface TargetsViewProps {
   targets: TargetHouse[];
@@ -398,6 +398,17 @@ export const TargetsView: React.FC<TargetsViewProps> = ({
                       </span>
                     )}
 
+                    {/* Team Type Badge */}
+                    {target.enemyTeam?.teamType && getTeamTypeMeta(target.enemyTeam.teamType) && (
+                      <span
+                        className={`text-[10px] font-bold px-2 py-0.5 rounded-lg border ${
+                          getTeamTypeMeta(target.enemyTeam.teamType)!.badgeClass
+                        }`}
+                      >
+                        สาย{getTeamTypeMeta(target.enemyTeam.teamType)!.label}
+                      </span>
+                    )}
+
                     {/* Tags */}
                     {(target.tags || []).map((tag) => (
                       <span
@@ -527,10 +538,11 @@ export const TargetsView: React.FC<TargetsViewProps> = ({
                       </div>
 
                       <TeamFormationView
-                        team={target.enemyTeam}
-                        type="enemy"
+                        strategyId={target.enemyTeam?.strategyId || '1-4'}
+                        frontCharacters={target.enemyTeam?.front?.characters || []}
+                        backCharacters={target.enemyTeam?.back?.characters || []}
+                        pets={target.enemyTeam?.pets || []}
                         compact={false}
-                        highlightChar={search}
                       />
 
                       {target.note && (
@@ -628,8 +640,12 @@ export const TargetsView: React.FC<TargetsViewProps> = ({
                               </div>
 
                               <TeamFormationView
-                                team={counter}
-                                type="counter"
+                                strategyId={counter.strategyId || '1-4'}
+                                frontCharacters={counter.front?.characters || []}
+                                backCharacters={counter.back?.characters || []}
+                                pets={counter.pets || []}
+                                skillOrder={counter.skillOrder || []}
+                                showSkillButtons={Boolean(counter.skillOrder?.length)}
                                 compact={true}
                               />
 
