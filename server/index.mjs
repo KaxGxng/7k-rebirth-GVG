@@ -933,7 +933,7 @@ async function startServer() {
 
   const port = Number(process.env.PORT || 3000);
   app.listen(port, '0.0.0.0', () => {
-    console.log(`7K Re:BIRTH GVG Combo Server running at http://localhost:${port}`);
+    console.log(`7K Re:BIRTH GVG Server running at http://localhost:${port}`);
   });
 }
 

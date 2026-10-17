@@ -90,10 +90,10 @@ export const LandingPage: React.FC = () => {
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-extrabold text-lg tracking-tight text-white">
-                  7K <span className="text-amber-400">COMBO</span>
+                  7K <span className="text-amber-400">RE:BIRTH</span>
                 </span>
                 <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/30">
-                  Re:BIRTH GVG
+                  GVG
                 </span>
               </div>
               <p className="text-xs text-slate-400">ระบบจัดการโพย Guild War และทีมแก้ทาง</p>

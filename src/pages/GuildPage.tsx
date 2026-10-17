@@ -750,7 +750,7 @@ export const GuildPage: React.FC = () => {
 
           <div className="text-center pt-2 border-t border-slate-800">
             <Link to="/" className="text-xs text-slate-400 hover:text-amber-400">
-              ← กลับหน้าแรก 7K Combo
+              ← กลับหน้าแรก 7K RE:BIRTH GVG
             </Link>
           </div>
         </div>
